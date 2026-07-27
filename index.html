@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#7c5cff">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="咩咩工作台">
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+<title>咩咩的工作台</title>
+<style>
+  :root{
+    --bg:#f5f3ff; --card:#ffffff; --primary:#7c5cff; --primary-soft:#ede9fe;
+    --accent:#ff8fab; --accent-soft:#ffe3ec; --green:#21bf73; --green-soft:#e3f9ee;
+    --red:#ff5d6c; --red-soft:#ffe8ea; --text:#2b2b3a; --text-soft:#8a8aa0;
+    --line:#ececf3; --shadow:0 6px 20px rgba(124,92,255,.10); --radius:18px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue","Microsoft YaHei",sans-serif;
+    background:var(--bg);color:var(--text);max-width:480px;margin:0 auto;padding-bottom:84px;-webkit-font-smoothing:antialiased;}
+  .app-head{position:sticky;top:0;z-index:20;background:linear-gradient(135deg,#7c5cff,#a78bfa);color:#fff;
+    padding:18px 18px 14px;border-radius:0 0 24px 24px;box-shadow:0 8px 20px rgba(124,92,255,.25);}
+  .app-head h1{font-size:20px;margin:0;display:flex;align-items:center;gap:8px;}
+  .app-head .sub{font-size:12px;opacity:.92;margin-top:4px;}
+  .sheep{font-size:24px;}
+  .date-bar{display:flex;align-items:center;justify-content:space-between;margin-top:12px;
+    background:rgba(255,255,255,.18);border-radius:14px;padding:8px 12px;font-size:13px;}
+  .date-bar b{font-size:15px;}
+  .mini-stats{display:flex;gap:6px;}
+  .mini-stats span{background:rgba(255,255,255,.22);border-radius:9px;padding:3px 8px;font-size:12px;}
+  .section{display:none;padding:16px 14px 0;animation:fade .25s ease;}
+  .section.active{display:block;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+  .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin-bottom:14px;}
+  .card-title{font-size:15px;font-weight:700;margin:0 0 12px;display:flex;align-items:center;gap:7px;}
+  .card-title .ico{font-size:18px;}
+  .tabbar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;
+    background:#fff;border-top:1px solid var(--line);display:flex;justify-content:space-around;
+    padding:8px 0 10px;z-index:30;box-shadow:0 -4px 16px rgba(0,0,0,.05);}
+  .tab{flex:1;text-align:center;color:var(--text-soft);font-size:11px;cursor:pointer;transition:.2s;}
+  .tab .ti{font-size:21px;display:block;margin-bottom:2px;transition:.2s;}
+  .tab.active{color:var(--primary);}
+  .tab.active .ti{transform:scale(1.18);}
+  .btn{border:none;border-radius:12px;padding:11px 16px;font-size:14px;font-weight:600;cursor:pointer;transition:.15s;font-family:inherit;}
+  .btn-primary{background:var(--primary);color:#fff;box-shadow:0 4px 12px rgba(124,92,255,.3);}
+  .btn-primary:active{transform:scale(.97);}
+  .btn-ghost{background:var(--primary-soft);color:var(--primary);}
+  .btn-sm{padding:7px 12px;font-size:12px;border-radius:10px;}
+  .btn-block{width:100%;}
+  .btn-danger{background:var(--red-soft);color:var(--red);}
+  .tag{display:inline-block;font-size:11px;padding:2px 9px;border-radius:20px;background:var(--primary-soft);color:var(--primary);}
+  .tag.g{background:var(--green-soft);color:var(--green);}
+  .tag.r{background:var(--red-soft);color:var(--red);}
+  .tag.a{background:var(--accent-soft);color:#e15a7d;}
+  input,select,textarea{width:100%;border:1px solid var(--line);border-radius:11px;padding:10px 12px;
+    font-size:14px;font-family:inherit;background:#fafaff;color:var(--text);outline:none;}
+  input:focus,select:focus,textarea:focus{border-color:var(--primary);background:#fff;}
+  label{font-size:12px;color:var(--text-soft);display:block;margin:10px 0 5px;}
+  .row{display:flex;gap:10px;}
+  .row>*{flex:1;}
+  .empty{text-align:center;color:var(--text-soft);font-size:13px;padding:24px 0;}
+  .toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:#2b2b3a;color:#fff;padding:10px 18px;border-radius:20px;font-size:13px;opacity:0;
+    transition:.3s;z-index:50;pointer-events:none;max-width:90%;text-align:center;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  /* fitness */
+  .day-tabs{display:flex;gap:5px;overflow-x:auto;padding-bottom:4px;margin-bottom:6px;-webkit-overflow-scrolling:touch;}
+  .day-tab{flex:0 0 auto;padding:7px 12px;border-radius:11px;background:var(--primary-soft);color:var(--primary);
+    font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;}
+  .day-tab.active{background:var(--primary);color:#fff;}
+  .day-tab .dnum{display:block;font-size:10px;opacity:.8;}
+  .workout{display:flex;align-items:flex-start;gap:11px;padding:12px 0;border-bottom:1px solid var(--line);}
+  .workout:last-child{border-bottom:none;}
+  .chk{width:22px;height:22px;border-radius:50%;border:2px solid var(--primary);flex:0 0 auto;margin-top:1px;
+    display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;cursor:pointer;transition:.15s;}
+  .chk.done{background:var(--primary);}
+  .workout-info{flex:1;}
+  .workout-info .wn{font-size:14px;font-weight:600;}
+  .workout-info .wd{font-size:12px;color:var(--text-soft);margin-top:2px;}
+  .workout-info .wm{font-size:11px;margin-top:4px;}
+  .rest-badge{background:var(--green-soft);color:var(--green);padding:2px 8px;border-radius:8px;font-size:11px;}
+  .progress-line{height:8px;background:var(--primary-soft);border-radius:6px;overflow:hidden;margin-top:4px;}
+  .progress-line i{display:block;height:100%;background:linear-gradient(90deg,#7c5cff,#a78bfa);border-radius:6px;transition:.4s;}
+  /* english */
+  .app-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);}
+  .app-item:last-child{border-bottom:none;}
+  .app-ico{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex:0 0 auto;}
+  .app-meta{flex:1;}
+  .app-meta .an{font-size:14px;font-weight:600;}
+  .app-meta .ad{font-size:12px;color:var(--text-soft);margin-top:2px;}
+  .task-card{padding:11px 0;border-bottom:1px dashed var(--line);}
+  .task-card:last-child{border-bottom:none;}
+  .task-head{display:flex;align-items:center;gap:10px;}
+  .task-head .tn{font-size:13px;font-weight:600;flex:1;}
+  /* jobs */
+  .job-card{padding:14px 0;border-bottom:1px solid var(--line);}
+  .job-card:last-child{border-bottom:none;}
+  .job-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+  .job-title{font-size:15px;font-weight:700;}
+  .job-co{font-size:12px;color:var(--text-soft);margin-top:3px;}
+  .job-match{font-size:11px;background:var(--primary-soft);color:var(--primary);padding:3px 9px;border-radius:20px;white-space:nowrap;font-weight:600;}
+  .job-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px;}
+  .job-foot{display:flex;justify-content:space-between;align-items:center;margin-top:10px;}
+  .job-dis{font-size:12px;color:var(--text-soft);}
+  .filter-bar{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:4px;-webkit-overflow-scrolling:touch;}
+  .filter-chip{flex:0 0 auto;padding:6px 12px;border-radius:20px;background:#fff;border:1px solid var(--line);
+    font-size:12px;color:var(--text-soft);cursor:pointer;white-space:nowrap;}
+  .filter-chip.active{background:var(--primary);color:#fff;border-color:var(--primary);}
+  /* bill */
+  .summary{display:flex;gap:10px;margin-bottom:4px;}
+  .sum-box{flex:1;background:var(--card);border-radius:14px;padding:13px;text-align:center;box-shadow:var(--shadow);}
+  .sum-box .sl{font-size:11px;color:var(--text-soft);}
+  .sum-box .sv{font-size:19px;font-weight:800;margin-top:3px;}
+  .sum-box.in .sv{color:var(--green);}
+  .sum-box.out .sv{color:var(--red);}
+  .sum-box.bal .sv{color:var(--primary);}
+  .bill-item{display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px solid var(--line);}
+  .bill-item:last-child{border-bottom:none;}
+  .bill-ico{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;flex:0 0 auto;}
+  .bill-meta{flex:1;}
+  .bill-meta .bn{font-size:14px;font-weight:600;}
+  .bill-meta .bc{font-size:11px;color:var(--text-soft);margin-top:2px;}
+  .bill-amt{font-size:15px;font-weight:700;}
+  .bill-amt.in{color:var(--green);}
+  .bill-amt.out{color:var(--red);}
+  .modal-mask{position:fixed;inset:0;background:rgba(43,43,58,.45);z-index:40;display:none;align-items:flex-end;}
+  .modal-mask.show{display:flex;}
+  .modal{background:#fff;width:100%;max-width:480px;margin:0 auto;border-radius:22px 22px 0 0;padding:20px 18px 28px;
+    animation:slideUp .28s ease;max-height:88vh;overflow-y:auto;}
+  @keyframes slideUp{from{transform:translateY(100%);}to{transform:none;}}
+  .modal h3{margin:0 0 6px;font-size:17px;}
+  .modal .close{float:right;font-size:22px;color:var(--text-soft);cursor:pointer;line-height:1;margin-top:-4px;}
+  .seg{display:flex;background:var(--primary-soft);border-radius:12px;padding:4px;margin-bottom:4px;}
+  .seg button{flex:1;border:none;background:transparent;border-radius:9px;padding:9px;font-size:13px;font-weight:600;
+    color:var(--text-soft);cursor:pointer;font-family:inherit;}
+  .seg button.on{background:#fff;color:var(--primary);box-shadow:0 2px 6px rgba(0,0,0,.06);}
+  .note{font-size:11px;color:var(--text-soft);margin-top:6px;line-height:1.6;}
+  .badge-sync{font-size:10px;background:rgba(255,255,255,.25);padding:2px 7px;border-radius:8px;}
+  .hint{background:var(--accent-soft);color:#c44d72;font-size:12px;padding:9px 12px;border-radius:11px;margin-bottom:12px;line-height:1.6;}
+  .stat-row{display:flex;justify-content:space-between;font-size:12px;color:var(--text-soft);margin-top:6px;}
+</style>
+</head>
+<body>
+
+<div class="app-head">
+  <h1><span class="sheep">🐑</span> 咩咩的工作台</h1>
+  <div class="sub">减脂塑型 · 每日英语 · 求职推荐 · 收支账单</div>
+  <div class="date-bar">
+    <div>📅 <b id="todayStr">--</b> <span id="weekday" style="color:#fff;opacity:.9"></span></div>
+    <div class="mini-stats">
+      <span id="msFit">🔥 0/0</span>
+      <span id="msEng">📚 0/0</span>
+      <span id="msEngDur">⏱️ 0min</span>
+      <span id="msBill">💰 ¥0</span>
+    </div>
+  </div>
+</div>
+
+<!-- 健身计划 -->
+<section class="section active" id="sec-fit">
+  <div class="card">
+    <div class="card-title"><span class="ico">🔥</span> 一周减脂塑型计划 <span class="tag" style="margin-left:auto">女生专属</span></div>
+    <div class="hint">🎯 双线并行：抖音直播跳操「东北赵又廷（减脂又塑形）」每周 4-5 次燃脂 + 健身房力量训练每周 3-4 次（按 <b>肩胸→背→腹→臀腿</b> 分部位）。点击 ○ 打卡；✎ 可编辑/删除/添加动作；每天底部还能<b>整体对调</b>到另一天（如周一肩胸 ↔ 周三背部）。</div>
+    <div class="day-tabs" id="dayTabs"></div>
+    <div id="weekOverview" style="display:flex;gap:4px;flex-wrap:wrap;margin:6px 0 2px"></div>
+    <div id="dayWorkouts"></div>
+    <div style="margin-top:10px">
+      <div class="stat-row"><span id="fitDayLabel">今日完成</span><span id="fitDayPct">0%</span></div>
+      <div class="progress-line"><i id="fitDayBar" style="width:0%"></i></div>
+      <div class="stat-row" style="margin-top:10px">
+        <span>🔥 今日消耗总热量</span>
+        <span><b id="fitKcalDone" style="color:var(--accent);font-size:15px">0</b> <span style="color:var(--text-soft)">/ <span id="fitKcalTotal">0</span> kcal</span></span>
+      </div>
+      <div class="progress-line" style="margin-top:5px"><i id="fitKcalBar" style="width:0%;background:linear-gradient(90deg,#ff8fab,#ff5d6c)"></i></div>
+      <div class="note">🔥 热量为网络公开数据按约55-60kg女性中等强度估算，实际因体重/强度而异，供参考。</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title"><span class="ico">📊</span> 本周战绩</div>
+    <div class="stat-row"><span>本周完成动作</span><span id="fitWeekNum">0 / 0</span></div>
+    <div class="progress-line" style="margin-top:8px"><i id="fitWeekBar" style="width:0%"></i></div>
+    <div class="note">💡 减脂期建议：力量训练后做 20-30 分钟有氧效果更佳；每日饮水 1.8-2.5L；保证 7 小时睡眠。</div>
+    <button class="btn btn-ghost btn-block" id="fitResetDefault" style="margin-top:10px">♻️ 恢复默认训练计划</button>
+  </div>
+</section>
+
+<!-- 每日英语 -->
+<section class="section" id="sec-eng">
+  <div class="card">
+    <div class="card-title"><span class="ico">📚</span> 手机 APP 英语训练 <span class="tag" style="margin-left:auto">每日 30-45min</span></div>
+    <div class="hint">🦉 以<b>多邻国 Duolingo</b>为主（每日闯关课程+复习），辅以<b>流利说</b>练口语跟读。每天按顺序完成并打卡；点 ✎ 可<b>编辑/删除/添加</b>任务与APP，按你当天情况自由调整。</div>
+    <div id="engApps"></div>
+  </div>
+  <div class="card">
+    <div class="card-title"><span class="ico">✅</span> 今日英语打卡</div>
+    <div id="engTasks"></div>
+    <button class="btn btn-ghost btn-block" id="engReset" style="margin-top:10px">🔄 重置今日打卡</button>
+    <div style="margin-top:14px;padding-top:12px;border-top:1px dashed var(--line)">
+      <div class="stat-row">
+        <span>⏱️ 今日英语学习总时长</span>
+        <span><b id="engTotalMin" style="color:var(--primary);font-size:17px">0</b> <span style="color:var(--text-soft)">分钟</span></span>
+      </div>
+      <div id="engDurList" style="margin-top:8px"></div>
+      <button class="btn btn-primary btn-block" id="engAddDur" style="margin-top:10px">➕ 记录学习时长</button>
+      <div class="note">⏱️ 时长按你手机 APP 实际使用记录，每天累计。可在「设置/屏幕使用时间」查看各 APP 时长后填入。</div>
+    </div>
+  </div>
+</section>
+
+<!-- 工作求职 -->
+<section class="section" id="sec-job">
+  <div class="card">
+    <div class="card-title"><span class="ico">💼</span> 求职推荐 <span class="badge-sync" id="jobSync">本地库</span></div>
+    <div class="hint">📍 中心：<b>和顺洋湖壹号</b> · 辐射 <b>8 公里</b> · 匹配：活动策划执行 / 行政教务 · 薪资 4k+ · 社保 · 双休/大小休</div>
+    <div class="filter-bar" id="jobFilters"></div>
+    <div id="jobList"></div>
+    <button class="btn btn-primary btn-block" id="jobRefresh" style="margin-top:8px">🔄 重新生成今日推荐（5-8个）</button>
+  </div>
+</section>
+
+<!-- 每日账单 -->
+<section class="section" id="sec-bill">
+  <div class="card">
+    <div class="card-title"><span class="ico">💰</span> 收支总况 <span class="tag" style="margin-left:auto" id="billMonth"></span></div>
+    <div class="summary">
+      <div class="sum-box in"><div class="sl">收入</div><div class="sv" id="sumIn">¥0</div></div>
+      <div class="sum-box out"><div class="sl">支出</div><div class="sv" id="sumOut">¥0</div></div>
+      <div class="sum-box bal"><div class="sl">结余</div><div class="sv" id="sumBal">¥0</div></div>
+    </div>
+    <div class="filter-bar" id="billFilters" style="margin-top:10px"></div>
+  </div>
+  <div class="card">
+    <div class="card-title"><span class="ico">🧾</span> 今日流水 <span style="margin-left:auto;font-size:12px;color:var(--text-soft)" id="billDate"></span></div>
+    <div id="billList"></div>
+    <div class="row" style="margin-top:8px">
+      <button class="btn btn-primary" id="billAdd" style="flex:1">➕ 记一笔</button>
+      <button class="btn btn-ghost" id="billImport" style="flex:1">📥 导入CSV</button>
+    </div>
+    <input type="file" id="billFile" accept=".csv,text/csv" style="display:none">
+  </div>
+  <div class="card">
+    <div class="card-title"><span class="ico">📈</span> 分类统计</div>
+    <div id="billCats"></div>
+  </div>
+</section>
+
+<!-- 健康生活 -->
+<section class="section" id="sec-health">
+  <div class="card">
+    <div class="card-title"><span class="ico">📏</span> 身体数据 <span class="tag" style="margin-left:auto">可手动调整</span></div>
+    <div class="row">
+      <div><label>身高(cm)</label><input type="number" id="bdHeight" inputmode="decimal" placeholder="160"></div>
+      <div><label>体重(kg)</label><input type="number" id="bdWeight" inputmode="decimal" placeholder="55"></div>
+    </div>
+    <div class="row" style="margin-top:4px">
+      <div><label>体脂(%)</label><input type="number" id="bdFat" inputmode="decimal" placeholder="25"></div>
+      <div><label>记录日期</label><input type="date" id="bdDate"></div>
+    </div>
+    <div id="bmiBox" style="margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--primary-soft);display:flex;justify-content:space-between;align-items:center">
+      <div><div style="font-size:12px;color:var(--text-soft)">BMI（身体质量指数）</div><div style="font-size:20px;font-weight:800;color:var(--primary)" id="bmiVal">—</div></div>
+      <div style="font-size:13px;font-weight:700;color:var(--primary)" id="bmiCat">填入身高体重</div>
+    </div>
+    <button class="btn btn-primary btn-block" id="bdSave" style="margin-top:12px">💾 保存身体数据</button>
+    <div id="bdHistory" style="margin-top:10px"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="ico">📈</span> 健康趋势</div>
+    <div class="filter-bar" id="trendFilters" style="margin-bottom:6px">
+      <div class="filter-chip active" data-t="weight">体重</div>
+      <div class="filter-chip" data-t="fat">体脂</div>
+      <div class="filter-chip" data-t="sleep">睡眠</div>
+    </div>
+    <div id="trendChart" style="width:100%;height:160px"></div>
+    <div id="trendStat" style="font-size:12px;color:var(--text-soft);margin-top:6px"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="ico">🍱</span> 今日饮食食谱 <span class="tag" style="margin-left:auto" id="foodDate"></span></div>
+    <div id="foodList"></div>
+    <button class="btn btn-ghost btn-block" id="foodAdd" style="margin-top:8px">➕ 添加一餐</button>
+    <div style="margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)">
+      <div class="stat-row">
+        <span>🔥 今日热量摄入</span>
+        <span><b id="foodKcal" style="color:var(--accent);font-size:17px">0</b> <span style="color:var(--text-soft)">kcal（目标 <span id="foodTarget">1500</span>）</span></span>
+      </div>
+      <div class="progress-line" style="margin-top:5px"><i id="foodKcalBar" style="width:0%;background:linear-gradient(90deg,#ff8fab,#ff5d6c)"></i></div>
+      <div class="note">🔥 单餐热量按食物名称网络检索常见值估算（约55-60kg女性减脂参考），可在添加时手动修正。</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="ico">💧</span> 每日饮水量</div>
+    <div class="summary" style="margin-bottom:6px">
+      <div class="sum-box bal"><div class="sl">已喝</div><div class="sv" id="waterMl">0 ml</div></div>
+      <div class="sum-box bal"><div class="sl">杯数</div><div class="sv" id="waterCups">0 杯</div></div>
+    </div>
+    <div class="progress-line"><i id="waterBar" style="width:0%;background:linear-gradient(90deg,#7c5cff,#a78bfa)"></i></div>
+    <div class="note" style="margin:6px 0 10px">目标 8 杯（1600ml）。每杯 200ml。</div>
+    <div class="row">
+      <button class="btn btn-primary" id="waterAdd" style="flex:1">➕ 喝一杯(200ml)</button>
+      <button class="btn btn-ghost" id="waterUndo" style="flex:1">↩️ 撤销一杯</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="ico">😴</span> 睡眠记录</div>
+    <div class="summary" style="margin-bottom:6px">
+      <div class="sum-box bal"><div class="sl">入睡</div><div class="sv" id="sleepStart">未记录</div></div>
+      <div class="sum-box bal"><div class="sl">起床</div><div class="sv" id="sleepEnd">未记录</div></div>
+      <div class="sum-box bal"><div class="sl">时长</div><div class="sv" id="sleepDur">0h</div></div>
+    </div>
+    <div class="row">
+      <button class="btn btn-ghost" id="sleepStartBtn" style="flex:1">🌙 记录入睡</button>
+      <button class="btn btn-ghost" id="sleepEndBtn" style="flex:1">☀️ 记录起床</button>
+    </div>
+    <button class="btn btn-danger btn-block" id="sleepReset" style="margin-top:8px">🗑 清除今日睡眠</button>
+    <div class="note">点击即记录当前实时时间；跨天睡眠（如23:30睡→7:00起）会自动按次日计算总时长。</div>
+  </div>
+</section>
+
+<!-- CSV 导入预览弹窗 -->
+<div class="modal-mask" id="csvModal">
+  <div class="modal">
+    <span class="close" id="csvClose">×</span>
+    <h3>📥 导入账单 CSV</h3>
+    <div class="hint" style="margin:0 0 10px">支持支付宝/微信/银行导出的账单 CSV。系统会自动识别日期、金额、收支方向与备注，归类到对应类别。导入前请预览确认。</div>
+    <div id="csvPreview" style="max-height:46vh;overflow:auto"></div>
+    <div class="row" style="margin-top:14px">
+      <button class="btn btn-ghost" id="csvCancel" style="flex:1">取消</button>
+      <button class="btn btn-primary" id="csvConfirm" style="flex:1">确认导入 <span id="csvCount"></span></button>
+    </div>
+  </div>
+</div>
+
+<!-- 底部导航 -->
+<div class="tabbar">
+  <div class="tab active" data-sec="sec-fit"><span class="ti">🔥</span>健身</div>
+  <div class="tab" data-sec="sec-eng"><span class="ti">📚</span>英语</div>
+  <div class="tab" data-sec="sec-job"><span class="ti">💼</span>求职</div>
+  <div class="tab" data-sec="sec-bill"><span class="ti">💰</span>账单</div>
+  <div class="tab" data-sec="sec-health"><span class="ti">🌿</span>健康</div>
+</div>
+
+<!-- 记账弹窗 -->
+<div class="modal-mask" id="billModal">
+  <div class="modal">
+    <span class="close" id="billClose">×</span>
+    <h3>记一笔</h3>
+    <div class="seg" id="billType">
+      <button class="on" data-t="out">支出</button>
+      <button data-t="in">收入</button>
+    </div>
+    <label>金额（元）</label>
+    <input type="number" id="billAmt" placeholder="0.00" step="0.01" inputmode="decimal">
+    <label>类别</label>
+    <select id="billCat"></select>
+    <label>日期</label>
+    <input type="date" id="billDateIn">
+    <label>明细备注</label>
+    <input type="text" id="billNote" placeholder="如：午餐外卖 / 兼职课时费">
+    <button class="btn btn-primary btn-block" id="billSave" style="margin-top:16px">保存</button>
+  </div>
+</div>
+
+<!-- 健身动作编辑弹窗 -->
+<div class="modal-mask" id="fitModal">
+  <div class="modal">
+    <span class="close" id="fitClose">×</span>
+    <h3 id="fitModalTitle">添加动作</h3>
+    <label>动作名称</label>
+    <input type="text" id="fitName" placeholder="如：哑铃弯举 / 跑步30分钟">
+    <label>安排 / 组次数 / 时长</label>
+    <input type="text" id="fitDesc" placeholder="如：4组×12次 / 30分钟">
+    <label>类型</label>
+    <select id="fitType">
+      <option value="力量">力量（无氧）</option>
+      <option value="跳操">赵又廷跳操</option>
+      <option value="有氧">其他有氧</option>
+      <option value="恢复">恢复/拉伸</option>
+    </select>
+    <label>部位 / 标签</label>
+    <input type="text" id="fitGroup" placeholder="如：肩胸 / 背 / 腹 / 臀腿 / 有氧 / 恢复">
+    <label>动作指导 / 跟练要点（选填）</label>
+    <textarea id="fitTip" rows="3" placeholder="写清发力点、组数节奏、易错点"></textarea>
+    <button class="btn btn-primary btn-block" id="fitSave" style="margin-top:16px">保存</button>
+  </div>
+</div>
+
+<!-- 英语任务编辑弹窗 -->
+<div class="modal-mask" id="engModal">
+  <div class="modal">
+    <span class="close" id="engModalClose">×</span>
+    <h3 id="engModalTitle">添加任务</h3>
+    <label>任务内容</label>
+    <input type="text" id="engTaskName" placeholder="如：多邻国完成1节课程">
+    <label>使用 APP</label>
+    <input type="text" id="engTaskApp" placeholder="如：多邻国 Duolingo / 流利说">
+    <button class="btn btn-primary btn-block" id="engTaskSave" style="margin-top:16px">保存</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* 注册 PWA Service Worker（支持离线使用与"添加到主屏幕"） */
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
+}
+/* ============ 工具 ============ */
+const $=(s,p=document)=>p.querySelector(s);
+const $$=(s,p=document)=>[...p.querySelectorAll(s)];
+const LS=(k,v)=>{if(v===undefined)return JSON.parse(localStorage.getItem(k)||'null');localStorage.setItem(k,JSON.stringify(v));};
+const fmt=n=>(n||0).toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2});
+const today=()=>{const d=new Date();const p=n=>String(n).padStart(2,'0');return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());};
+const todayCN=()=>{const d=new Date();return `${d.getMonth()+1}月${d.getDate()}日`;};
+const WK=['周日','周一','周二','周三','周四','周五','周六'];
+const toast=(m)=>{const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),1800);};
+
+$('#todayStr').textContent=todayCN();
+$('#weekday').textContent=WK[new Date().getDay()];
+$('#billDate').textContent=todayCN();
+$('#billMonth').textContent=new Date().getMonth()+1+'月';
+
+/* ============ 导航 ============ */
+$$('.tab').forEach(t=>t.onclick=()=>{
+  $$('.tab').forEach(x=>x.classList.remove('active'));
+  $$('.section').forEach(s=>s.classList.remove('active'));
+  t.classList.add('active');
+  $('#'+t.dataset.sec).classList.add('active');
+  if(t.dataset.sec==='sec-bill')renderBill();
+  if(t.dataset.sec==='sec-job')renderJobs();
+  if(t.dataset.sec==='sec-health'){renderBody();renderFood();renderWater();renderSleep();renderTrend();}
+});
+
+/* ============ 健身计划 ============
+   双线并行：
+   · 抖音直播跳操「东北赵又廷（减脂又塑形）」每周 4-5 次（燃脂有氧）
+   · 健身房力量训练每周 3-4 次，按 肩胸 / 背 / 腹部 / 臀腿 分部位循环
+*/
+// 默认计划（首次使用写入本地，之后以本地为准，可自由编辑）
+const FIT_DEFAULT=[
+  // day:0=周一 ... 6=周日
+  {day:0,name:'周一',type:'力量',focus:'肩胸',title:'健身房·肩胸日',live:false,items:[
+    {n:'坐姿器械推胸 / 哑铃卧推',d:'4组×12次 · 收紧肩胛，推起呼气',m:'力量',g:'肩胸',tip:'躺平后腰贴凳，小臂垂直地面，推到顶端时胸肌夹紧，缓慢下放至大臂与地面平行。'},
+    {n:'器械夹胸（蝴蝶机）',d:'4组×15次 · 顶峰停顿1秒',m:'力量',g:'肩胸',tip:'想象抱一棵大树，动作末端两臂靠拢时停顿感受胸肌收缩，回放慢放2秒。'},
+    {n:'哑铃肩上推举',d:'3组×12次 · 核心收紧',m:'力量',g:'肩胸',tip:'坐姿靠背，哑铃置于耳侧，垂直向上推，不要耸肩，下放至下巴高度。'},
+    {n:'哑铃侧平举',d:'3组×15次 · 小重量控节奏',m:'力量',g:'肩胸',tip:'手微握杯状，肘略高于腕，抬到与肩同高即可，避免借力甩。'},
+    {n:'赵又廷直播跳操（跟练）',d:'30-40分钟 · 当晚或清晨跟直播',m:'跳操',g:'有氧',tip:'抖音搜「东北赵又廷（减脂又塑形）」直播间，跟着跳完整场，心率保持微喘能说话。'},
+  ]},
+  {day:1,name:'周二',type:'跳操',focus:'全身燃脂',title:'赵又廷直播跳操日',live:true,items:[
+    {n:'赵又廷直播跳操（跟练）',d:'45-60分钟 · 全程跟直播',m:'跳操',g:'有氧',tip:'抖音搜「东北赵又廷（减脂又塑形）」开播即跟，动作跟不上就小幅度跟，保心率不保标准。'},
+    {n:'跳后拉伸',d:'10分钟 · 重点腿+腰',m:'恢复',g:'恢复',tip:'大腿前侧、小腿、腰部各拉伸30秒，缓解跳操后肌肉紧绷。'},
+  ]},
+  {day:2,name:'周三',type:'力量',focus:'背部',title:'健身房·背部日',live:false,items:[
+    {n:'高位下拉',d:'4组×12次 · 挺胸沉肩',m:'力量',g:'背',tip:'握距略宽于肩，下拉时肘部向后下方，想象用肘把重量拉下，顶峰夹背。'},
+    {n:'坐姿划船',d:'4组×12次 · 挺胸不驼背',m:'力量',g:'背',tip:'回拉至腹部，肩胛后缩，慢放感受背阔肌拉伸，避免耸肩圆背。'},
+    {n:'哑铃单臂划船',d:'每侧3组×12次',m:'力量',g:'背',tip:'一手撑凳，另一手沿腿侧上提至腰侧，身体稳住不扭，练背厚度。'},
+    {n:'赵又廷直播跳操（跟练）',d:'20-30分钟 · 轻量有氧',m:'跳操',g:'有氧',tip:'背部训练后再跟一小场跳操，进一步燃脂，量力而行。'},
+  ]},
+  {day:3,name:'周四',type:'跳操',focus:'全身燃脂',title:'赵又廷直播跳操日',live:true,items:[
+    {n:'赵又廷直播跳操（跟练）',d:'45-60分钟 · 全程跟直播',m:'跳操',g:'有氧',tip:'第二天跳操注意补水，中间休息不超过30秒，保持燃脂心率区间。'},
+    {n:'泡沫轴放松',d:'10分钟 · 重点背+腿',m:'恢复',g:'恢复',tip:'用泡沫轴缓慢滚压背部、大腿，每个痛点停留20秒。'},
+  ]},
+  {day:4,name:'周五',type:'力量',focus:'腹部',title:'健身房·腹部核心日',live:false,items:[
+    {n:'悬垂举腿 / 仰卧举腿',d:'4组×15次 · 慢放控节奏',m:'力量',g:'腹',tip:'下腹为主，举腿时呼气收腹，下放不触地，避免借惯性甩腿。'},
+    {n:'卷腹',d:'3组×20次 · 下巴微收',m:'力量',g:'腹',tip:'上腹为主，仅肩胛离地，腰椎贴地，起来呼气落下吸气。'},
+    {n:'俄罗斯转体',d:'3组×每侧20次 · 持轻哑铃',m:'力量',g:'腹',tip:'坐姿后倾，左右转体触地，练侧腹，背挺直不塌。'},
+    {n:'平板支撑',d:'3组×45-60秒',m:'力量',g:'腹',tip:'肩肘垂直，臀腹收紧成一条直线，塌腰即停，循序渐进延长时间。'},
+    {n:'赵又廷直播跳操（跟练）',d:'20-30分钟',m:'跳操',g:'有氧',tip:'核心日后再来一小场跳操，燃脂收尾。'},
+  ]},
+  {day:5,name:'周六',type:'力量',focus:'臀腿',title:'健身房·臀腿日（重点）',live:false,items:[
+    {n:'杠铃/哑铃深蹲',d:'4组×15次 · 膝盖对准脚尖',m:'力量',g:'臀腿',tip:'双脚与肩同宽，下蹲到大腿平行地面，重心在脚跟，起身夹臀，护膝不内扣。'},
+    {n:'臀冲（杠铃臀桥）',d:'4组×15次 · 顶端夹紧',m:'力量',g:'臀腿',tip:'上背靠凳，杠铃置于髋部，顶到身体成直线时用力夹臀停顿1秒，练臀王牌动作。'},
+    {n:'箭步蹲',d:'每侧3组×12次',m:'力量',g:'臀腿',tip:'向前迈大步，下蹲至双膝约90°，后腿膝盖轻触地，起身用前腿臀发力。'},
+    {n:'腿举 / 倒蹬',d:'3组×15次',m:'力量',g:'臀腿',tip:'双脚置于踏板中下部，蹬起不锁死膝，下放至大腿贴近胸口，练腿整体。'},
+    {n:'赵又廷直播跳操（跟练）',d:'20分钟 · 轻量',m:'跳操',g:'有氧',tip:'臀腿大重量后做轻量跳操促进恢复与燃脂。'},
+  ]},
+  {day:6,name:'周日',type:'休息',focus:'休息',title:'完全休息 / 轻活动',live:false,items:[
+    {n:'散步',d:'20-30分钟随意',m:'恢复',g:'恢复',tip:'轻松步行促进代谢，不追求强度。'},
+    {n:'充足睡眠',d:'早睡 · 7小时+',m:'恢复',g:'恢复',tip:'睡眠是减脂塑形关键，生长激素在深睡时分泌。'},
+    {n:'饮食控制',d:'控碳水 · 优质蛋白',m:'恢复',g:'恢复',tip:'休息日代谢略降，适当减少碳水、保证鸡胸/蛋/奶等蛋白摄入。'},
+  ]},
+];
+// 给每个动作生成稳定 id，保证打卡不会因编辑错位
+function ensureFitId(){
+  FIT_PLAN.forEach(p=>p.items.forEach(it=>{if(!it.id)it.id='f'+Math.random().toString(36).slice(2,9);}));
+}
+let FIT_PLAN=LS('fit_plan')||JSON.parse(JSON.stringify(FIT_DEFAULT));
+ensureFitId();
+// 单一动作热量估算（基于网络公开数据，约55-60kg女性中等强度大致消耗）
+// 会随"描述里的时长/组数/强度"动态变化：有氧按分钟、力量按组数、跳操按分钟
+function estKcal(it){
+  const n=it.n||'',m=it.m,g=it.g,d=it.d||'';
+  // 解析时长（分钟）：匹配 "45-60分钟"/"30分钟"/"20分钟" 取较大值；或 "45min"
+  const minM=d.match(/(\d+)\s*[-~]?\s*(\d+)?\s*(分钟|min|分)/);
+  let mins=0;
+  if(minM){mins=Math.max(parseInt(minM[1]),parseInt(minM[2]||minM[1]));}
+  // 解析组数（力量）：匹配 "4组"/"3组×12次"
+  const grpM=d.match(/(\d+)\s*组/);
+  const groups=grpM?parseInt(grpM[1]):0;
+  if(m==='跳操'){const base=mins?mins:50;return Math.round(base*5.6);} // 约5.6kcal/min
+  if(m==='有氧'){
+    if(/跳绳/.test(n))return Math.round((mins||30)*7);   // ~7kcal/min
+    if(/慢跑|跑步/.test(n))return Math.round((mins||30)*9.3); // ~9.3kcal/min
+    if(/骑车|游泳|骑行/.test(n))return Math.round((mins||30)*8);
+    if(/椭圆/.test(n))return Math.round((mins||20)*6.5);
+    return Math.round((mins||30)*7.5);
+  }
+  if(m==='恢复')return Math.round((mins||15)*3);          // 拉伸/散步 ~3kcal/min
+  if(m==='力量'){
+    // 力量按组数算：复合动作每组约15kcal，孤立约10kcal
+    const per=/(深蹲|卧推|划船|硬拉|臀冲|箭步|腿举|推胸|下拉)/.test(n)?15:10;
+    const gs=groups||4;
+    return Math.round(per*gs);
+  }
+  if(g==='腹')return Math.round((mins||10)*6);            // 核心 ~6kcal/min
+  return Math.round((mins||20)*5);
+}
+FIT_PLAN.forEach(p=>p.items.forEach(it=>{it.kcal=estKcal(it);})); // 每次都按当前内容重算
+LS('fit_plan',FIT_PLAN);
+let fitDone=LS('fit_done')||{}; // {date:{id:true}}
+const fitKey=today();
+if(!fitDone[fitKey])fitDone[fitKey]={};
+// 根据今天星期几，精准定位到 FIT_PLAN 中对应那一天（按星期名匹配，避免数组下标偏移）
+function todayFitIndex(){
+  const WD=['周日','周一','周二','周三','周四','周五','周六'];
+  const name=WD[new Date().getDay()];
+  const idx=FIT_PLAN.findIndex(p=>p.name===name);
+  return idx<0?0:idx;
+}
+function renderFitTabs(){
+  const cur=todayFitIndex();
+  $('#dayTabs').innerHTML=FIT_PLAN.map((p,i)=>
+    `<div class="day-tab${i===cur?' active':''}" data-i="${i}">${p.name}<span class="dnum">第${i+1}天</span></div>`).join('');
+  // 周力量分部位总览
+  $('#weekOverview').innerHTML=FIT_PLAN.map((p,i)=>{
+    const ic=p.type==='力量'?'🏋️':p.type==='跳操'?'📺':'🌿';
+    const sub=p.type==='力量'?p.focus:p.type==='跳操'?'跳操':'休息';
+    return `<div style="flex:1;min-width:46px;text-align:center;background:${p.type==='力量'?'var(--primary-soft)':p.type==='跳操'?'var(--accent-soft)':'var(--green-soft)'};border-radius:10px;padding:6px 2px">
+      <div style="font-size:13px">${ic}</div><div style="font-size:10px;color:var(--text-soft)">${p.name}</div>
+      <div style="font-size:10px;font-weight:700;color:var(--text)">${sub}</div></div>`;
+  }).join('');
+  $$('#dayTabs .day-tab').forEach(t=>t.onclick=()=>{
+    $$('#dayTabs .day-tab').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');renderFitDay(+t.dataset.i);
+  });
+  renderFitDay(cur);
+}
+const FOCUS_TAG={肩胸:'💪肩胸',背:'🔙背部',腹:'🔥腹部',臀腿:'🍑臀腿',恢复:'🌿恢复',有氧:'❤️有氧'};
+let curFitDay=0;
+function renderFitDay(i){
+  curFitDay=i;
+  const p=FIT_PLAN[i];
+  const done=fitDone[fitKey]||{};
+  $('#dayWorkouts').innerHTML=p.items.map((it,k)=>{
+    const isDone=done[it.id];
+    const isLive=it.m==='跳操';
+    const tagCls=it.m==='跳操'?'a':it.m==='恢复'?'g':'';
+    return `<div class="workout">
+      <div class="chk${isDone?' done':''}" data-id="${it.id}">${isDone?'✓':''}</div>
+      <div class="workout-info">
+        <div class="wn">${it.n} ${isLive?'<span class="rest-badge" style="background:var(--accent-soft);color:#e15a7d">直播</span>':''}</div>
+        <div class="wd">${it.d}</div>
+        <div class="wm"><span class="tag ${tagCls}">${it.m}</span> <span class="tag">${FOCUS_TAG[it.g]||it.g}</span> <span class="tag a">🔥 约${it.kcal} kcal</span></div>
+        ${it.tip?`<details style="margin-top:7px"><summary style="font-size:12px;color:var(--primary);cursor:pointer">▸ 动作指导 / 跟练要点</summary>
+          <div style="font-size:12px;color:var(--text-soft);line-height:1.7;margin-top:5px;background:var(--primary-soft);padding:9px 11px;border-radius:10px">${it.tip}</div></details>`:''}
+        <div class="wm" style="margin-top:8px;justify-content:flex-end;display:flex;gap:8px">
+          <span class="fit-edit btn btn-sm btn-ghost" data-act="edit" data-id="${it.id}" style="padding:5px 12px">✎ 编辑</span>
+          <span class="fit-edit btn btn-sm btn-danger" data-act="del" data-id="${it.id}">🗑 删除</span>
+        </div>
+      </div></div>`;
+  }).join('') + `
+    <div style="margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)">
+      <div style="font-size:12px;color:var(--text-soft);margin-bottom:7px">🔄 整体对调：把今天整天的计划与另一天互换</div>
+      <div class="row">
+        <select id="fitSwapTarget">
+          ${FIT_PLAN.map((q,j)=>j===i?'':`<option value="${j}">${q.name}（${q.title}）</option>`).join('')}
+        </select>
+        <button class="btn btn-ghost btn-sm" id="fitSwapBtn" style="flex:0 0 auto;white-space:nowrap">对调</button>
+      </div>
+    </div>
+    <button class="btn btn-ghost btn-block" id="fitAddBtn" style="margin-top:10px">➕ 添加今日动作</button>`;
+  $$('#dayWorkouts .chk').forEach(c=>c.onclick=()=>{
+    const id=c.dataset.id;
+    fitDone[fitKey][id]=!fitDone[fitKey][id];LS('fit_done',fitDone);renderFitDay(i);renderFitWeek();
+  });
+  $$('#dayWorkouts .fit-edit').forEach(b=>b.onclick=()=>{
+    const id=b.dataset.id,it=p.items.find(x=>x.id===id);
+    if(b.dataset.act==='del'){if(confirm('确定删除该动作？')){p.items=p.items.filter(x=>x.id!==id);LS('fit_plan',FIT_PLAN);renderFitDay(i);renderFitWeek();toast('已删除');}}
+    else fitEditModal(i,id);
+  });
+  $('#fitAddBtn').onclick=()=>fitEditModal(i,null);
+  $('#fitSwapBtn').onclick=()=>{
+    const j=+document.querySelector('#fitSwapTarget').value;
+    if(isNaN(j)||j===i)return;
+    // 整体对调两天的训练内容（动作列表+部位/类型/标题），星期名与格子保持不动
+    const a=FIT_PLAN[i],b=FIT_PLAN[j];
+    const swapKeys=['items','focus','type','title','live'];
+    swapKeys.forEach(k=>{const t=a[k];a[k]=b[k];b[k]=t;});
+    LS('fit_plan',FIT_PLAN);renderFitTabs();renderFitWeek();
+    toast(`已与${b.name}整体对调训练内容`);
+  };
+  const total=p.items.length,doneN=p.items.filter(it=>done[it.id]).length;
+  $('#fitDayLabel').textContent=`${p.name}·${p.title}（${doneN}/${total}）`;
+  const pct=total?Math.round(doneN/total*100):0;
+  $('#fitDayPct').textContent=pct+'%';$('#fitDayBar').style.width=pct+'%';
+  // 今日消耗总热量：已打卡动作累加 / 全部完成目标
+  const kcalTotal=p.items.reduce((s,it)=>s+(+it.kcal||0),0);
+  const kcalDone=p.items.filter(it=>done[it.id]).reduce((s,it)=>s+(+it.kcal||0),0);
+  $('#fitKcalTotal').textContent=kcalTotal;
+  $('#fitKcalDone').textContent=kcalDone;
+  $('#fitKcalBar').style.width=(kcalTotal?Math.round(kcalDone/kcalTotal*100):0)+'%';
+}
+function renderFitWeek(){
+  let total=0,done=0;
+  FIT_PLAN.forEach(p=>p.items.forEach(it=>{total++;if((fitDone[fitKey]||{})[it.id])done++;}));
+  $('#fitWeekNum').textContent=done+' / '+total;
+  const pct=total?Math.round(done/total*100):0;
+  $('#fitWeekBar').style.width=pct+'%';
+  $('#msFit').textContent='🔥 '+done+'/'+total;
+}
+// 健身动作编辑/添加弹窗
+let fitEditDay=0,fitEditId=null;
+function fitEditModal(day,id){
+  fitEditDay=day;fitEditId=id;
+  const p=FIT_PLAN[day];
+  if(id){const it=p.items.find(x=>x.id===id);
+    $('#fitModalTitle').textContent='编辑动作';
+    $('#fitName').value=it.n;$('#fitDesc').value=it.d;
+    $('#fitType').value=it.m==='跳操'?'跳操':it.m==='有氧'?'有氧':it.m==='恢复'?'恢复':'力量';
+    $('#fitGroup').value=it.g;$('#fitTip').value=it.tip||'';
+  }else{
+    $('#fitModalTitle').textContent='添加动作 · '+p.name;
+    $('#fitName').value='';$('#fitDesc').value='';$('#fitType').value='力量';$('#fitGroup').value='';$('#fitTip').value='';
+  }
+  $('#fitModal').classList.add('show');
+}
+$('#fitClose').onclick=()=>$('#fitModal').classList.remove('show');
+$('#fitModal').onclick=(e)=>{if(e.target.id==='fitModal')$('#fitModal').classList.remove('show');};
+$('#fitSave').onclick=()=>{
+  const n=$('#fitName').value.trim();if(!n){toast('请输入动作名称');return;}
+  const d=$('#fitDesc').value.trim();const m=$('#fitType').value;
+  const g=$('#fitGroup').value.trim()||(m==='跳操'?'有氧':m==='恢复'?'恢复':'力量');
+  const tip=$('#fitTip').value.trim();
+  const p=FIT_PLAN[fitEditDay];
+  const kcal=estKcal({n,d,m,g,tip});
+  if(fitEditId){const it=p.items.find(x=>x.id===fitEditId);Object.assign(it,{n,d,m,g,tip,kcal});}
+  else p.items.push({id:'f'+Math.random().toString(36).slice(2,9),n,d,m,g,tip,kcal});
+  LS('fit_plan',FIT_PLAN);$('#fitModal').classList.remove('show');renderFitDay(fitEditDay);renderFitWeek();toast('已保存');
+};
+$('#fitResetDefault').onclick=()=>{
+  if(confirm('恢复为初始默认训练计划？你当前的修改将丢失。')){
+    FIT_PLAN=JSON.parse(JSON.stringify(FIT_DEFAULT));ensureFitId();LS('fit_plan',FIT_PLAN);
+    renderFitTabs();renderFitWeek();toast('已恢复默认计划');
+  }
+};
+
+renderFitTabs();renderFitWeek();
+
+/* ============ 每日英语 ============ */
+let engApps=LS('eng_apps')||[
+  {name:'多邻国 Duolingo',ico:'🦉',color:'#e3f9ee',desc:'主阵地：每日打卡课程+复习，游戏化闯关'},
+  {name:'英语流利说',ico:'🗣️',color:'#ede9fe',desc:'辅练：跟读模仿，纠发音练口语语调'},
+];
+let engTasks=LS('eng_tasks')||[
+  {n:'多邻国 完成 1 节课程 + 复习',app:'多邻国 Duolingo',done:false},
+  {n:'多邻国 听音辨词 / 拼写练习 10 分钟',app:'多邻国 Duolingo',done:false},
+  {n:'流利说 跟读模仿 5 个句子（纠发音）',app:'英语流利说',done:false},
+  {n:'流利说 朗读一段短文（练语调流畅度）',app:'英语流利说',done:false},
+];
+let engDate=LS('eng_date')||'';
+if(engDate!==today()){engTasks.forEach(t=>t.done=false);engDate=today();LS('eng_tasks',engTasks);LS('eng_date',engDate);}
+let engDur=LS('eng_dur')||{}; // { 'YYYY-MM-DD': { 'APP名': 分钟 } }
+function renderEng(){
+  $('#engApps').innerHTML=engApps.map((a,i)=>
+    `<div class="app-item"><div class="app-ico" style="background:${a.color}">${a.ico}</div>
+     <div class="app-meta"><div class="an">${a.name}</div><div class="ad">${a.desc}</div></div>
+     <span class="eng-app-del" data-i="${i}" style="margin-left:8px;font-size:14px;cursor:pointer;color:var(--red)">🗑</span></div>`).join('')
+     + `<button class="btn btn-ghost btn-block" id="engAppAdd" style="margin-top:8px">➕ 添加APP</button>`;
+  $('#engTasks').innerHTML=engTasks.map((t,i)=>
+    `<div class="task-card"><div class="task-head">
+       <div class="chk${t.done?' done':''}" data-i="${i}">${t.done?'✓':''}</div>
+       <div class="tn">${t.n}</div>
+     </div><div class="ad" style="font-size:11px;color:var(--text-soft);margin:4px 0 0 32px">📲 ${t.app}</div>
+       <div style="display:flex;gap:8px;margin-top:8px;justify-content:flex-end">
+         <span class="eng-task-edit btn btn-sm btn-ghost" data-act="edit" data-i="${i}">✎ 编辑</span>
+         <span class="eng-task-edit btn btn-sm btn-danger" data-act="del" data-i="${i}">🗑 删除</span>
+       </div></div>`).join('')
+     + `<button class="btn btn-ghost btn-block" id="engTaskAdd" style="margin-top:8px">➕ 添加任务</button>`;
+  $$('#engTasks .chk').forEach(c=>c.onclick=()=>{
+    engTasks[+c.dataset.i].done=!engTasks[+c.dataset.i].done;LS('eng_tasks',engTasks);renderEng();renderEngStat();
+  });
+  $$('#engTasks .eng-task-edit').forEach(b=>b.onclick=()=>{
+    const i=+b.dataset.i;
+    if(b.dataset.act==='del'){if(confirm('确定删除该任务？')){engTasks.splice(i,1);LS('eng_tasks',engTasks);renderEng();renderEngStat();toast('已删除');}}
+    else engTaskModal(i);
+  });
+  $$('#engApps .eng-app-del').forEach(b=>b.onclick=()=>{
+    const i=+b.dataset.i;if(confirm('确定删除该APP？')){engApps.splice(i,1);LS('eng_apps',engApps);renderEng();toast('已删除');}
+  });
+  $('#engAppAdd').onclick=()=>{
+    const name=prompt('APP 名称（可加emoji图标，如 🦉多邻国）：');
+    if(!name)return;
+    const desc=prompt('一句话说明用法：','每日打卡')||'';
+    engApps.push({name,ico:name.match(/^\P{ASCII}/u)?name[0]:'📱',color:'#ede9fe',desc});LS('eng_apps',engApps);renderEng();toast('已添加');
+  };
+  $('#engTaskAdd').onclick=()=>engTaskModal(null);
+  // 每日英语学习时长
+  const dur=engDur[today()]||{};
+  const totalMin=Object.values(dur).reduce((s,v)=>s+(+v||0),0);
+  $('#engTotalMin').textContent=totalMin;
+  $('#engDurList').innerHTML=Object.keys(dur).length?Object.entries(dur).map(([app,m])=>
+    `<div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-soft);padding:3px 0">
+      <span>${app}</span><span>${m} 分钟 <span class="eng-dur-del" data-app="${app}" style="color:var(--red);cursor:pointer;margin-left:6px">🗑</span></span></div>`).join(''):'';
+  $$('#engDurList .eng-dur-del').forEach(b=>b.onclick=()=>{
+    const app=b.dataset.app;if(confirm('删除该APP的时长记录？')){delete engDur[today()][app];LS('eng_dur',engDur);renderEng();renderEngStat();toast('已删除');}
+  });
+  $('#engAddDur').onclick=()=>{
+    const app=prompt('记录哪个APP的学习时长？\n（可选：'+engApps.map(a=>a.name).join(' / ')+'）','多邻国 Duolingo');
+    if(!app)return;
+    const min=prompt('本次学习了多少分钟？','15');
+    const m=parseInt(min);if(isNaN(m)||m<=0){toast('请输入有效分钟数');return;}
+    if(!engDur[today()])engDur[today()]={};
+    engDur[today()][app]=(+engDur[today()][app]||0)+m;LS('eng_dur',engDur);renderEng();renderEngStat();toast('已记录 +'+m+' 分钟');
+  };
+}
+function engTaskModal(i){
+  const t=i!==null?engTasks[i]:null;
+  $('#engModalTitle').textContent=t?'编辑任务':'添加任务';
+  $('#engTaskName').value=t?t.n:'';$('#engTaskApp').value=t?t.app:'';
+  $('#engTaskSave').onclick=()=>{
+    const n=$('#engTaskName').value.trim();if(!n){toast('请输入任务');return;}
+    const app=$('#engTaskApp').value.trim()||'多邻国 Duolingo';
+    if(t){Object.assign(t,{n,app});}else engTasks.push({n,app,done:false});
+    LS('eng_tasks',engTasks);$('#engModal').classList.remove('show');renderEng();renderEngStat();toast('已保存');
+  };
+  $('#engModal').classList.add('show');
+}
+$('#engModalClose').onclick=()=>$('#engModal').classList.remove('show');
+$('#engModal').onclick=(e)=>{if(e.target.id==='engModal')$('#engModal').classList.remove('show');};
+$('#engReset').onclick=()=>{engTasks.forEach(t=>t.done=false);LS('eng_tasks',engTasks);renderEng();renderEngStat();toast('已重置');};
+function renderEngStat(){
+  const d=engTasks.filter(t=>t.done).length;$('#msEng').textContent='📚 '+d+'/'+engTasks.length;
+  const dur=engDur[today()]||{};
+  const tm=Object.values(dur).reduce((s,v)=>s+(+v||0),0);
+  $('#msEngDur').textContent='⏱️ '+tm+'min';
+}
+renderEng();renderEngStat();
+
+/* ============ 工作求职 ============ */
+const HOME={lat:28.1280,lng:112.9350}; // 和顺洋湖壹号 近似坐标(长沙洋湖片区)
+function dist(a,b){ // 简单线性近似，1经纬度≈111km
+  const dx=(a.lat-b.lat)*111,dy=(a.lng-b.lng)*111*Math.cos(a.lat*Math.PI/180);
+  return Math.sqrt(dx*dx+dy*dy);
+}
+// 职位库（围绕洋湖/含浦/湘江新区片区模拟真实公司点位）
+const JOB_POOL=[
+  {t:'活动执行专员',co:'湖南洋湖文化传媒有限公司',lat:28.130,lng:112.938,salary:'4.5-6k',type:'活动策划',social:true,rest:'双休',exp:'1年',kw:['活动','执行','策划']},
+  {t:'行政教务老师',co:'美吉姆国际早教(洋湖中心)',lat:28.126,lng:112.932,salary:'4-5k',type:'行政教务',social:true,rest:'大小休',exp:'经验优先',kw:['行政','教务','排课','早教']},
+  {t:'行政专员',co:'长沙湘江新区某科技公司',lat:28.135,lng:112.940,salary:'4-5.5k',type:'行政',social:true,rest:'双休',exp:'1年',kw:['行政','考勤','数据']},
+  {t:'活动策划专员',co:'湖南悦动会展服务有限公司',lat:28.122,lng:112.945,salary:'5-7k',type:'活动策划',social:true,rest:'大小休',exp:'1-2年',kw:['活动','策划','执行']},
+  {t:'门店运营督导',co:'洋湖商圈某连锁餐饮',lat:28.131,lng:112.930,salary:'4.5-6k',type:'运营',social:true,rest:'大小休',exp:'1年',kw:['门店','运营','管理']},
+  {t:'教务主管',co:'含浦艺术培训中心',lat:28.118,lng:112.920,salary:'4.5-6k',type:'行政教务',social:true,rest:'双休',exp:'2年',kw:['教务','排课','行政']},
+  {t:'市场推广专员',co:'洋湖万达某教育品牌',lat:28.128,lng:112.936,salary:'4-6k',type:'市场',social:true,rest:'大小休',exp:'经验优先',kw:['市场','推广','活动']},
+  {t:'行政前台',co:'长沙智谷企业服务公司',lat:28.140,lng:112.948,salary:'4-4.5k',type:'行政',social:true,rest:'双休',exp:'应届可',kw:['行政','前台','考勤']},
+  {t:'活动运营助理',co:'湖南广电周边某MCN',lat:28.150,lng:112.960,salary:'5-7k',type:'活动策划',social:true,rest:'大小休',exp:'1年',kw:['活动','运营','策划']},
+  {t:'仓库物资管理',co:'洋湖某零售企业',lat:28.124,lng:112.928,salary:'4-5k',type:'行政',social:true,rest:'单休可谈',exp:'经验优先',kw:['仓库','盘点','采买']},
+  {t:'课程顾问',co:'岳麓区某素质教育机构',lat:28.115,lng:112.915,salary:'4-8k',type:'教务销售',social:true,rest:'大小休',exp:'经验优先',kw:['教务','顾问','早教']},
+  {t:'策划执行（兼职可转）',co:'长沙某婚庆活动工作室',lat:28.133,lng:112.942,salary:'按项目4-8k',type:'活动策划',social:false,rest:'弹性',exp:'经验优先',kw:['活动','策划','执行']},
+  {t:'人事行政助理',co:'湘江新区产业园企业',lat:28.142,lng:112.952,salary:'4.5-5.5k',type:'行政',social:true,rest:'双休',exp:'1年',kw:['人事','行政','考勤','周报']},
+  {t:'校区运营专员',co:'岳麓区连锁教培机构',lat:28.110,lng:112.910,salary:'4.5-6k',type:'运营',social:true,rest:'大小休',exp:'1年',kw:['运营','教务','门店']},
+  {t:'活动主持/执行',co:'洋湖湿地公园活动公司',lat:28.127,lng:112.934,salary:'5-6k',type:'活动策划',social:true,rest:'大小休',exp:'经验优先',kw:['活动','执行','策划']},
+  {t:'数据录入/统计文员',co:'含浦某电商公司',lat:28.116,lng:112.918,salary:'4-4.8k',type:'行政',social:true,rest:'双休',exp:'应届可',kw:['数据','统计','行政']},
+];
+const RESUME_KW=['活动','策划','执行','行政','教务','排课','运营','门店','考勤','数据','仓库','早教','市场'];
+let jobFilter='全部';
+function matchScore(j){
+  let s=0;
+  RESUME_KW.forEach(k=>{if(j.kw.includes(k))s+=18;});
+  // 距离加分（越近越高）
+  const d=dist(HOME,{lat:j.lat,lng:j.lng});
+  s+=Math.max(0,30-d*4);
+  if(j.social)s+=8;
+  if(j.rest.includes('双休'))s+=6;else if(j.rest.includes('大小休'))s+=4;
+  return {score:Math.round(s),dist:d};
+}
+let jobToday=LS('job_today')||null;
+let jobDate=LS('job_date')||'';
+function genJobs(){
+  const scored=JOB_POOL.map(j=>({...j,...matchScore(j)}))
+    .filter(j=>j.dist<=8) // 8公里辐射
+    .sort((a,b)=>b.score-a.score);
+  const n=Math.min(8,Math.max(5,Math.floor(Math.random()*4)+5));
+  // 取前若干，但保证覆盖活动+行政两类
+  const act=scored.filter(j=>j.type.includes('活动'));
+  const adm=scored.filter(j=>!j.type.includes('活动'));
+  let pick=[];
+  pick.push(...act.slice(0,Math.ceil(n/2)));
+  pick.push(...adm.slice(0,Math.floor(n/2)));
+  // 补足到n
+  for(const j of scored){if(pick.length>=n)break;if(!pick.includes(j))pick.push(j);}
+  pick=pick.slice(0,n).sort((a,b)=>a.dist-b.dist);
+  jobToday=pick;jobDate=today();LS('job_today',jobToday);LS('job_date',jobDate);
+}
+function renderJobFilters(){
+  const cats=['全部','活动策划','行政教务','运营','市场'];
+  $('#jobFilters').innerHTML=cats.map(c=>
+    `<div class="filter-chip${c===jobFilter?' active':''}" data-c="${c}">${c}</div>`).join('');
+  $$('#jobFilters .filter-chip').forEach(f=>f.onclick=()=>{jobFilter=f.dataset.c;renderJobFilters();renderJobs();});
+}
+function renderJobs(){
+  if(jobDate!==today()||!jobToday)genJobs();
+  const list=(jobToday||[]).filter(j=>jobFilter==='全部'||j.type.includes(jobFilter==='活动策划'?'活动':jobFilter==='行政教务'?'教务':jobFilter));
+  $('#jobList').innerHTML=list.length?list.map(j=>
+    `<div class="job-card">
+      <div class="job-top">
+        <div><div class="job-title">${j.t}</div><div class="job-co">🏢 ${j.co}</div></div>
+        <div class="job-match">匹配 ${j.score}</div>
+      </div>
+      <div class="job-meta">
+        <span class="tag">💰 ${j.salary}</span>
+        <span class="tag ${j.social?'g':'r'}">${j.social?'五险':'社保面议'}</span>
+        <span class="tag a">${j.rest}</span>
+        <span class="tag">📅 ${j.exp}</span>
+      </div>
+      <div class="job-foot">
+        <div class="job-dis">📍 距你约 ${j.dist.toFixed(1)} km · ${j.type}</div>
+        <button class="btn btn-ghost btn-sm" data-co="${j.co}" data-t="${j.t}">标记感兴趣</button>
+      </div>
+    </div>`).join(''):'<div class="empty">暂无匹配职位，试试其他筛选</div>';
+  $$('#jobList button').forEach(b=>b.onclick=()=>{toast('已记录：'+b.dataset.t+' @ '+b.dataset.co);});
+}
+$('#jobRefresh').onclick=()=>{genJobs();renderJobs();toast('已重新生成今日推荐');};
+renderJobFilters();renderJobs();
+
+/* ============ 每日账单 ============ */
+let bills=LS('bills')||[];
+const CATS={out:['餐饮外卖','交通出行','购物','零食水果','学习提升','健身运动','房租水电','医疗','其他支出'],
+            in:['工资薪金','兼职收入','理财收益','红包转账','其他收入']};
+const CAT_ICO={餐饮外卖:'🍱',交通出行:'🚌',购物:'🛍️',零食水果:'🍎',学习提升:'📚',健身运动:'🏋️',房租水电:'🏠',医疗:'💊',其他支出:'🧾',
+  工资薪金:'💼',兼职收入:'🤝',理财收益:'📈',红包转账:'🧧',其他收入:'💰'};
+let billFilter='全部';
+let billType='out';
+function renderBillFilters(){
+  const cats=['全部',...CATS.out,...CATS.in];
+  $('#billFilters').innerHTML=cats.map(c=>
+    `<div class="filter-chip${c===billFilter?' active':''}" data-c="${c}">${c}</div>`).join('');
+  $$('#billFilters .filter-chip').forEach(f=>f.onclick=()=>{billFilter=f.dataset.c;renderBill();});
+}
+function renderBill(){
+  const month=new Date().toISOString().slice(0,7);
+  const mBills=bills.filter(b=>b.date.slice(0,7)===month);
+  const sumIn=mBills.filter(b=>b.type==='in').reduce((s,b)=>s+b.amt,0);
+  const sumOut=mBills.filter(b=>b.type==='out').reduce((s,b)=>s+b.amt,0);
+  $('#sumIn').textContent='¥'+fmt(sumIn);
+  $('#sumOut').textContent='¥'+fmt(sumOut);
+  $('#sumBal').textContent='¥'+fmt(sumIn-sumOut);
+  $('#msBill').textContent='💰 ¥'+fmt(sumIn-sumOut);
+  // 今日流水
+  const td=today();
+  let list=bills.filter(b=>b.date===td);
+  if(billFilter!=='全部')list=list.filter(b=>b.cat===billFilter);
+  list=list.sort((a,b)=>b.id-a.id);
+  $('#billList').innerHTML=list.length?list.map(b=>
+    `<div class="bill-item">
+      <div class="bill-ico" style="background:${b.type==='in'?'var(--green-soft)':'var(--red-soft)'}">${CAT_ICO[b.cat]||'💱'}</div>
+      <div class="bill-meta"><div class="bn">${b.cat}</div><div class="bc">${b.note||'—'} · ${b.date.slice(5)}</div></div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="bill-amt ${b.type==='in'?'in':'out'}">${b.type==='in'?'+':'-'}¥${fmt(b.amt)}</div>
+        <span class="bill-del" data-id="${b.id}" style="font-size:14px;cursor:pointer;color:var(--red)">🗑</span>
+      </div>
+    </div>`).join(''):'<div class="empty">今天还没有记录，点下方记一笔 💡</div>';
+  $$('#billList .bill-del').forEach(b=>b.onclick=()=>{
+    const id=+b.dataset.id;if(confirm('确定删除这条记录？')){bills=bills.filter(x=>x.id!==id);LS('bills',bills);renderBill();toast('已删除');}
+  });
+  // 分类统计
+  const stat={};
+  mBills.forEach(b=>{stat[b.cat]=(stat[b.cat]||0)+b.amt;});
+  const sorted=Object.entries(stat).sort((a,b)=>b[1]-a[1]);
+  const tot=sorted.reduce((s,x)=>s+x[1],0)||1;
+  $('#billCats').innerHTML=sorted.length?sorted.map(([c,v])=>
+    `<div style="margin:9px 0"><div style="display:flex;justify-content:space-between;font-size:13px">
+      <span>${CAT_ICO[c]||'💱'} ${c}</span><span style="font-weight:700">¥${fmt(v)}</span></div>
+      <div class="progress-line" style="margin-top:5px"><i style="width:${Math.round(v/tot*100)}%"></i></div></div>`).join('')
+    :'<div class="empty">本月暂无账单</div>';
+}
+// 弹窗
+function openBill(){
+  billType='out';
+  $$('#billType button').forEach(b=>b.classList.toggle('on',b.dataset.t==='out'));
+  fillCat();
+  $('#billAmt').value='';$('#billNote').value='';$('#billDateIn').value=today();
+  $('#billModal').classList.add('show');
+}
+function fillCat(){
+  $('#billCat').innerHTML=CATS[billType].map(c=>`<option>${c}</option>`).join('');
+}
+$$('#billType button').forEach(b=>b.onclick=()=>{
+  billType=b.dataset.t;$$('#billType button').forEach(x=>x.classList.toggle('on',x===b));fillCat();
+});
+$('#billAdd').onclick=openBill;
+$('#billClose').onclick=()=>$('#billModal').classList.remove('show');
+$('#billModal').onclick=(e)=>{if(e.target.id==='billModal')$('#billModal').classList.remove('show');};
+$('#billSave').onclick=()=>{
+  const amt=parseFloat($('#billAmt').value);
+  if(!amt||amt<=0){toast('请输入有效金额');return;}
+  bills.push({id:Date.now(),type:billType,amt:Math.round(amt*100)/100,
+    cat:$('#billCat').value,date:$('#billDateIn').value||today(),note:$('#billNote').value.trim()});
+  LS('bills',bills);$('#billModal').classList.remove('show');renderBill();toast('已记录 💡');
+};
+
+/* ============ CSV 导入 ============ */
+const ALL_CATS=[...CATS.out,...CATS.in];
+// 类别智能匹配：根据备注/商品名关键词归类
+function guessCat(text,type){
+  const t=(text||'')+'';
+  const map=[
+    [/餐饮|外卖|食堂|美食|餐厅|咖啡|奶茶|午饭|晚饭|早餐|零食|水果|超市|生鲜|买菜|肯德基|麦当劳|星巴克|瑞幸|必胜客|汉堡|麻辣|火锅|烧烤|便当|面馆|饭店|点心/,type==='in'?'其他收入':'餐饮外卖'],
+    [/交通|地铁|公交|打车|滴滴|加油|停车|高铁|火车|机票|出行/,type==='in'?'其他收入':'交通出行'],
+    [/淘宝|京东|拼多多|购物|衣服|鞋|美妆|日用|百货|电商|商城/,type==='in'?'其他收入':'购物'],
+    [/零食|水果|坚果|饮料/,type==='in'?'其他收入':'零食水果'],
+    [/学习|课程|培训|书|网课|知识|教育/,type==='in'?'其他收入':'学习提升'],
+    [/健身|瑜伽|运动|私教|游泳馆/,type==='in'?'其他收入':'健身运动'],
+    [/房租|水电|物业|燃气|宽带|话费/,type==='in'?'其他收入':'房租水电'],
+    [/医院|药店|医疗|诊所|保健/,type==='in'?'其他收入':'医疗'],
+    [/工资|薪资|薪金|薪酬|发薪|收入|转账|红包|退款|收款|返现|理财|利息|兼职|佣金/,type==='in'?'其他收入':'其他支出'],
+  ];
+  for(const [re,c] of map){if(re.test(t))return c;}
+  return type==='in'?'其他收入':'其他支出';
+}
+// 解析 CSV 文本 -> 标准化账单数组
+function parseCSV(text){
+  const lines=text.split(/\r?\n/).filter(l=>l.trim());
+  if(lines.length<2)return [];
+  // 简单 CSV 解析（处理引号包裹的逗号）
+  const parseLine=l=>{
+    const out=[];let cur='';let q=false;
+    for(let i=0;i<l.length;i++){const ch=l[i];
+      if(ch==='"'){q=!q;}
+      else if(ch===','&&!q){out.push(cur);cur='';}
+      else cur+=ch;
+    }
+    out.push(cur);return out.map(s=>s.trim());
+  };
+  const rows=lines.map(parseLine);
+  const header=rows[0].map(h=>h.replace(/^﻿/,''));
+  // 列识别（启发式）
+  const findCol=(keys)=>{for(let i=0;i<header.length;i++){if(keys.some(k=>header[i].includes(k)))return i;}return -1;};
+  const cDate=findCol(['交易时间','日期','时间','记账日','交易日期','发生日']);
+  const cAmt=findCol(['金额','交易金额','金额(元)','收/支金额','发生额','交易额','借方','贷方','借贷']);
+  let cType=findCol(['收/支','收支','类型','方向','收付','资金流向','借贷方向']);
+  if(cType>=0&&cType===cAmt)cType=-1; // 同列时不重复
+  const cNote=findCol(['商品','备注','说明','摘要','交易对方','交易备注','用途','名称']);
+  const cMethod=findCol(['收/付款方式','付款方式','支付方式','账户','卡号']);
+  if(cDate<0&&cAmt<0)return []; // 无法识别
+  const result=[];
+  for(let r=1;r<rows.length;r++){
+    const row=rows[r];if(row.length<Math.max(cDate,cAmt,cType)+1&&row.every(x=>!x))continue;
+    let amtRaw=row[cAmt]||'';
+    const amt=parseFloat(amtRaw.replace(/[^\d.\-]/g,''));
+    if(isNaN(amt)||amt===0)continue;
+    // 收支方向判定
+    let type='out';
+    if(cType>=0){
+      const tv=(row[cType]||'').toString().trim();
+      const tvNum=parseFloat(tv.replace(/[^\d.\-]/g,''));
+      // 若类型列内容像金额（纯数字），说明是借贷金额列，改用正负判断
+      if(!isNaN(tvNum)&&/^[-\d.]/.test(tv)){type=amt<0?'in':'out';}
+      else if(/收入|收|贷|进|转入|收款|红包|退款|工资|薪金|入账/.test(tv)&&!/支出|支|借|出/.test(tv))type='in';
+      else if(/支出|支|借|出|转出|消费|花|付/.test(tv))type='out';
+      else type=amt<0?'in':'out';
+    }else{type=amt<0?'out':'in';}
+    // 备注里出现工资/入账等关键词强制为收入
+    const noteText=(cNote>=0?row[cNote]:'')+(cType>=0?row[cType]:'');
+    if(/工资|薪金|入账|薪酬|发薪|收款|红包|退款|返现|利息/.test(noteText))type='in';
+    const amtAbs=Math.abs(amt);
+    // 日期标准化
+    let date='';
+    if(cDate>=0){date=normDate(row[cDate]);}
+    const note=[row[cNote],cMethod>=0?row[cMethod]:''].filter(Boolean).join(' / ');
+    const cat=guessCat(note+(cType>=0?row[cType]:''),type);
+    result.push({id:Date.now()+Math.floor(Math.random()*1000)+r,type,amt:Math.round(amtAbs*100)/100,cat,date:date||today(),note});
+  }
+  return result;
+}
+function normDate(s){
+  s=(s||'').toString().trim();
+  // 支持 2026/07/27 14:30、2026-07-27、2026年07月27日、07/27/2026
+  let m=s.match(/(\d{4})[^\d](\d{1,2})[^\d](\d{1,2})/);
+  if(m){const p=n=>String(n).padStart(2,'0');return m[1]+'-'+p(+m[2])+'-'+p(+m[3]);}
+  m=s.match(/(\d{1,2})[^\d](\d{1,2})[^\d](\d{4})/);
+  if(m){const p=n=>String(n).padStart(2,'0');return m[3]+'-'+p(+m[1])+'-'+p(+m[2]);}
+  return today();
+}
+let csvPending=[];
+$('#billImport').onclick=()=>$('#billFile').click();
+$('#billFile').onchange=(e)=>{
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=()=>{
+    csvPending=parseCSV(reader.result);
+    if(!csvPending.length){toast('未能识别该 CSV 格式');return;}
+    // 预览
+    $('#csvPreview').innerHTML=csvPending.slice(0,50).map(b=>
+      `<div style="display:flex;justify-content:space-between;font-size:12px;padding:6px 0;border-bottom:1px solid var(--line)">
+        <span style="color:var(--text-soft)">${b.date} · ${b.cat}</span>
+        <span style="font-weight:600;color:${b.type==='in'?'var(--green)':'var(--red)'}">${b.type==='in'?'+':'-'}${fmt(b.amt)}</span>
+      </div>${b.note?`<div style="font-size:11px;color:var(--text-soft);margin:-2px 0 4px">${b.note.slice(0,40)}</div>`:''}`).join('')
+      + (csvPending.length>50?`<div style="font-size:11px;color:var(--text-soft);padding:6px">…共 ${csvPending.length} 条</div>`:'');
+    $('#csvCount').textContent='('+csvPending.length+'条)';
+    $('#csvModal').classList.add('show');
+  };
+  reader.readAsText(file,'UTF-8');
+  e.target.value=''; // 允许重复选同文件
+};
+$('#csvClose').onclick=()=>$('#csvModal').classList.remove('show');
+$('#csvCancel').onclick=()=>$('#csvModal').classList.remove('show');
+$('#csvModal').onclick=(e)=>{if(e.target.id==='csvModal')$('#csvModal').classList.remove('show');};
+$('#csvConfirm').onclick=()=>{
+  if(!csvPending.length)return;
+  bills=bills.concat(csvPending);LS('bills',bills);csvPending=[];
+  $('#csvModal').classList.remove('show');renderBill();toast('已导入 ✅');
+};
+renderBillFilters();renderBill();
+
+/* ============ 健康生活 ============ */
+// 身体数据（按日期记录历史，可手动更新）
+let bodyData=LS('body_data')||[]; // [{date,height,weight,fat,bmi}]
+// BMI = 体重(kg) / 身高(m)^2，中国标准分类
+function calcBMI(h,w){
+  h=parseFloat(h);w=parseFloat(w);
+  if(!h||!w)return null;
+  const bmi=w/Math.pow(h/100,2);
+  let cat;
+  if(bmi<18.5)cat='偏瘦';
+  else if(bmi<24)cat='正常';
+  else if(bmi<28)cat='超重';
+  else cat='肥胖';
+  return {val:bmi,cat};
+}
+function renderBMI(){
+  const r=calcBMI($('#bdHeight').value,$('#bdWeight').value);
+  if(r){$('#bmiVal').textContent=r.val.toFixed(1);$('#bmiCat').textContent=r.cat;}
+  else{$('#bmiVal').textContent='—';$('#bmiCat').textContent='填入身高体重';}
+}
+function renderBody(){
+  const h=bodyData[bodyData.length-1]||{};
+  $('#bdHeight').value=h.height||'';
+  $('#bdWeight').value=h.weight||'';
+  $('#bdFat').value=h.fat||'';
+  $('#bdDate').value=today();
+  renderBMI();
+  $('#bdHistory').innerHTML=bodyData.length?bodyData.slice(-5).reverse().map(b=>
+    `<div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text-soft);padding:4px 0;border-bottom:1px solid var(--line)">
+      <span>${b.date}</span><span>身高${b.height||'-'} · 体重${b.weight||'-'}kg · 体脂${b.fat||'-'}%${b.bmi?' · BMI'+b.bmi:''}</span></div>`).join(''):'';
+}
+['bdHeight','bdWeight'].forEach(id=>$('#'+id).addEventListener('input',renderBMI));
+$('#bdSave').onclick=()=>{
+  const d=$('#bdDate').value||today();
+  const o={date:d,height:$('#bdHeight').value.trim(),weight:$('#bdWeight').value.trim(),fat:$('#bdFat').value.trim()};
+  const r=calcBMI(o.height,o.weight);if(r)o.bmi=r.val.toFixed(1);
+  // 同日覆盖
+  const i=bodyData.findIndex(x=>x.date===d);
+  if(i>=0)bodyData[i]=o;else bodyData.push(o);
+  LS('body_data',bodyData);renderBody();toast('已保存身体数据 💾');
+};
+
+// 饮食食谱 + 热量（按每100g热量换算，支持"牛肉100g+米饭100g"格式）
+let foods=LS('foods')||{}; // {date:[{name,kcal}]}
+// 每100g可食部热量(kcal/100g)，基于《中国食物成分表》及权威营养数据源
+const FOOD_PER100={
+  // 主食类
+  '米饭':116,'大米':346,'杂粮饭':130,'糙米饭':123,'粥':46,'面条':110,'面':110,'荞麦面':138,'意面':158,'馒头':223,'花卷':214,'面包':265,'全麦':247,'燕麦':389,'麦片':377,'即食燕麦':380,'藜麦':368,'紫薯':86,'红薯':86,'山药':57,'芋头':79,'年糕':154,'汤圆':250,'玉米':106,
+  // 蛋白类
+  '鸡蛋':144,'鸡胸':133,'鸡腿':147,'鸡肉':167,'牛肉':125,'牛瘦肉':125,'猪肉':143,'猪瘦肉':143,'羊肉':203,'鱼肉':105,'三文鱼':139,'金枪鱼':108,'虾':93,'蟹':95,'豆腐':81,'豆浆':31,'毛豆':131,'鹰嘴豆':164,'蛋白粉':380,
+  // 奶类
+  '牛奶':54,'酸奶':72,'希腊酸奶':59,'奶酪':328,'咖啡':2,'奶茶':430,'可乐':43,'果汁':45,
+  // 蔬菜类
+  '西兰花':34,'青菜':20,'白菜':17,'番茄':18,'黄瓜':15,'胡萝卜':41,'土豆':77,'菠菜':23,'生菜':15,'紫甘蓝':25,'南瓜':26,'四季豆':31,'冬瓜':10,'蘑菇':22,'香菇':26,'海带':13,'木耳':27,'洋葱':40,'芦笋':20,'芹菜':16,'藕':73,'魔芋':7,'秋葵':37,
+  // 水果类
+  '苹果':52,'香蕉':89,'橙子':47,'梨':42,'葡萄':43,'草莓':32,'蓝莓':57,'西瓜':30,'桃子':39,'猕猴桃':61,'柚子':42,'芒果':60,'木瓜':30,
+  // 坚果/油脂/其他
+  '坚果':580,'花生':567,'核桃':654,'瓜子':600,'腰果':553,'巴旦木':579,'牛油果':160,'奇亚籽':486,'沙拉':80,'沙拉酱':380,'橄榄油':899,'食用油':899,'披萨':266,'汉堡':292,'火锅':150,'烧烤':180,'零食':500,'水果':60,'代餐':350
+};
+// 近似替换表：识别不到时，用相似类别食物的热量替代（避免无法计算）
+const FOOD_SIMILAR={
+  '杂粮':'杂粮饭','粗粮':'杂粮饭','糙米':'糙米饭','谷':'米饭','主食':'米饭','饭':'米饭',
+  '肉':'猪肉','瘦肉':'猪瘦肉','肉糜':'猪肉','丸':'猪肉','排':'猪肉','腿肉':'鸡腿',
+  '鱼':'鱼肉','海鲜':'虾','贝':'虾',
+  '菜':'青菜','叶菜':'青菜','绿色蔬菜':'青菜','蔬菜':'青菜','瓜':'黄瓜','薯':'红薯',
+  '果':'苹果','莓':'草莓',
+  '奶':'牛奶','乳':'牛奶','酪':'奶酪',
+  '豆':'豆腐','豆制品':'豆腐',
+  '籽':'奇亚籽','仁':'核桃',
+  '酱':'沙拉酱','油':'食用油','脂':'牛油果'
+};
+// 解析 "牛肉100g+米饭100g+蔬菜100g" -> 总热量(kcal)，返回 {kcal, detail}
+function calcFoodKcal(text){
+  const segs=text.split(/[+＋,，、\s]+/).map(s=>s.trim()).filter(Boolean);
+  let total=0;const parts=[];
+  segs.forEach(seg=>{
+    const m=seg.match(/^(.*?)(\d+(?:\.\d+)?)\s*(g|克|ml|毫升)?$/);
+    if(!m)return;
+    const food=m[1].trim();const gram=parseFloat(m[2])||100;
+    // 1) 精确/最长匹配
+    let per=0,matched='';
+    for(const k in FOOD_PER100){if(food.includes(k)&&k.length>matched.length){per=FOOD_PER100[k];matched=k;}}
+    let approx=false;
+    // 2) 近似替换
+    if(!matched){
+      for(const k in FOOD_SIMILAR){if(food.includes(k)){const sk=FOOD_SIMILAR[k];per=FOOD_PER100[sk];matched=sk;approx=true;break;}}
+    }
+    if(!matched){parts.push(food+'('+gram+'g 无数据)');return;}
+    const kc=Math.round(per*gram/100);total+=kc;
+    parts.push((approx?'≈':'')+matched+gram+'g='+kc+(approx?'*':''));
+  });
+  return {kcal:total,detail:parts.join(' + ')};
+}
+function renderFood(){
+  const td=today();$('#foodDate').textContent=td.slice(5);
+  const list=foods[td]||[];
+  $('#foodList').innerHTML=list.length?list.map((f,i)=>
+    `<div style="display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--line)">
+      <div style="flex:1"><div style="font-size:14px;font-weight:600">${f.name}</div><div style="font-size:11px;color:var(--text-soft)">🔥 ${f.kcal} kcal${f.m?(' · '+f.m):''}${f.detail?(' · '+f.detail):''}</div></div>
+      <span class="food-edit" data-i="${i}" style="color:var(--primary);cursor:pointer;font-size:14px">✎</span>
+      <span class="food-del" data-i="${i}" style="color:var(--red);cursor:pointer;font-size:14px">🗑</span>
+    </div>`).join(''):'<div class="empty">今天还没记录饮食，点下方添加 🍱</div>';
+  $$('#foodList .food-del').forEach(b=>b.onclick=()=>{
+    const i=+b.dataset.i;foods[td].splice(i,1);if(!foods[td].length)delete foods[td];LS('foods',foods);renderFood();toast('已删除');
+  });
+  $$('#foodList .food-edit').forEach(b=>b.onclick=()=>{
+    const i=+b.dataset.i;const f=foods[td][i];
+    const raw=prompt('编辑这餐记录（格式：备注 食物名+克数，如 午餐 牛肉100g+米饭100g）',f.name);
+    if(!raw)return;
+    let m='',text=raw;
+    const cm=raw.match(/^(.+?)[：:]\s*(.+)$/);
+    if(cm){m=cm[1].trim();text=cm[2].trim();}else if(/\s/.test(raw)&&!raw.includes('g')&&!raw.includes('克')){[m,text]=raw.split(/\s+/);}
+    const r=calcFoodKcal(text);
+    if(r.kcal===0){toast('未能识别食物，请按"食物名+克数"');return;}
+    foods[td][i]={name:raw.trim(),kcal:r.kcal,m,detail:r.detail};
+    LS('foods',foods);renderFood();toast('已修改 🍱');
+  });
+  const total=list.reduce((s,f)=>s+(+f.kcal||0),0);
+  $('#foodKcal').textContent=total;
+  const target=+$('#foodTarget').textContent||1500;
+  $('#foodKcalBar').style.width=Math.min(100,Math.round(total/target*100))+'%';
+}
+$('#foodAdd').onclick=()=>{
+  const raw=prompt('记录这餐（格式示例：午餐 牛肉100g+米饭100g+西兰花100g）');
+  if(!raw)return;
+  // 备注与食物分离：冒号/空格前为备注
+  let m='',text=raw;
+  const cm=raw.match(/^(.+?)[：:]\s*(.+)$/);
+  if(cm){m=cm[1].trim();text=cm[2].trim();}else if(/\s/.test(raw)&&!raw.includes('g')&&!raw.includes('克')){[m,text]=raw.split(/\s+/);}
+  const r=calcFoodKcal(text);
+  if(r.kcal===0){toast('未能识别食物，请按"食物名+克数"格式');return;}
+  const finalM=m||'';
+  const td=today();if(!foods[td])foods[td]=[];
+  foods[td].push({name:raw.trim(),kcal:r.kcal,m:finalM,detail:r.detail});
+  LS('foods',foods);renderFood();toast('已记录 🍱 '+r.kcal+'kcal');
+};
+
+// 饮水
+let water=LS('water')||{}; // {date:cups}
+const WATER_TARGET=8,WATER_ML=200;
+function renderWater(){
+  const c=water[today()]||0;
+  $('#waterMl').textContent=(c*WATER_ML)+' ml';
+  $('#waterCups').textContent=c+' 杯';
+  $('#waterBar').style.width=Math.min(100,Math.round(c/WATER_TARGET*100))+'%';
+}
+$('#waterAdd').onclick=()=>{const td=today();water[td]=(water[td]||0)+1;LS('water',water);renderWater();};
+$('#waterUndo').onclick=()=>{const td=today();water[td]=Math.max(0,(water[td]||0)-1);LS('water',water);renderWater();};
+
+// 睡眠
+let sleep=LS('sleep')||{}; // {date:{start,end}}
+function nowHM(){const d=new Date();return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');}
+function renderSleep(){
+  const td=today();const s=sleep[td];
+  $('#sleepStart').textContent=s&&s.start?s.start:'未记录';
+  $('#sleepEnd').textContent=s&&s.end?s.end:'未记录';
+  if(s&&s.start&&s.end){
+    const [h1,m1]=s.start.split(':').map(Number),[h2,m2]=s.end.split(':').map(Number);
+    let mins=(h2*60+m2)-(h1*60+m1);
+    if(mins<=0)mins+=24*60; // 跨天
+    const hh=Math.floor(mins/60),mm=mins%60;
+    $('#sleepDur').textContent=hh+'h'+(mm?mm+'m':'');
+  }else $('#sleepDur').textContent='0h';
+}
+$('#sleepStartBtn').onclick=()=>{const td=today();if(!sleep[td])sleep[td]={};sleep[td].start=nowHM();LS('sleep',sleep);renderSleep();toast('已记录入睡 🌙 '+sleep[td].start);};
+$('#sleepEndBtn').onclick=()=>{const td=today();if(!sleep[td])sleep[td]={};sleep[td].end=nowHM();LS('sleep',sleep);renderSleep();toast('已记录起床 ☀️ '+sleep[td].end);};
+$('#sleepReset').onclick=()=>{if(confirm('清除今日睡眠记录？')){delete sleep[today()];LS('sleep',sleep);renderSleep();toast('已清除');}};
+
+// 健康趋势图表（纯SVG折线，按日期）
+let trendType='weight';
+function sleepDurMin(s){if(!s||!s.start||!s.end)return null;const[h1,m1]=s.start.split(':').map(Number),[h2,m2]=s.end.split(':').map(Number);let mins=(h2*60+m2)-(h1*60+m1);if(mins<=0)mins+=24*60;return mins;}
+function renderTrend(){
+  const data=bodyData.slice().sort((a,b)=>a.date<b.date?-1:1); // 按日期升序
+  let vals=[];
+  if(trendType==='sleep'){
+    vals=data.map(b=>sleep[b.date]?{date:b.date,v:sleepDurMin(sleep[b.date])}:null).filter(Boolean);
+  }else{
+    const key=trendType;
+    vals=data.filter(b=>b[key]).map(b=>({date:b.date,v:parseFloat(b[key])}));
+  }
+  const el=$('#trendChart');const W=300,H=160,pad=22;
+  if(vals.length<1){el.innerHTML='<div style="text-align:center;color:var(--text-soft);font-size:12px;padding:50px 0">记录至少1天数据后显示趋势</div>';$('#trendStat').textContent='';return;}
+  if(vals.length===1){el.innerHTML='<div style="text-align:center;color:var(--text-soft);font-size:12px;padding:50px 0">已有1天数据，继续记录看趋势 📈</div>';$('#trendStat').textContent=vals[0].date+'：'+(trendType==='sleep'?(Math.floor(vals[0].v/60)+'h'+(vals[0].v%60)+'m'):vals[0].v+(trendType==='fat'?'%':'kg'));return;}
+  const xs=vals.map((_,i)=>pad+(W-2*pad)*i/(vals.length-1));
+  const vs=vals.map(d=>d.v);const min=Math.min(...vs),max=Math.max(...vs);
+  const range=(max-min)||1;
+  const ys=vs.map(v=>H-pad-(H-2*pad)*(v-min)/range);
+  const color=trendType==='weight'?'#7c5cff':trendType==='fat'?'#ff8fab':'#21bf73';
+  const line=xs.map((x,i)=>(i?'L':'M')+x.toFixed(1)+' '+ys[i].toFixed(1)).join(' ');
+  const dots=xs.map((x,i)=>`<circle cx="${x.toFixed(1)}" cy="${ys[i].toFixed(1)}" r="3.5" fill="${color}"/>`).join('');
+  const labels=vals.map((d,i)=>`<text x="${xs[i].toFixed(1)}" y="${H-6}" font-size="9" fill="#8a8aa0" text-anchor="middle">${d.date.slice(5)}</text>`).join('');
+  const ymin=`<text x="2" y="${(H-pad).toFixed(0)}" font-size="9" fill="#8a8aa0">${min}</text>`;
+  const ymax=`<text x="2" y="${(pad+2).toFixed(0)}" font-size="9" fill="#8a8aa0">${max}</text>`;
+  el.innerHTML=`<svg width="100%" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+    <path d="${line}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linejoin="round"/>
+    ${dots}${labels}${ymin}${ymax}</svg>`;
+  const unit=trendType==='fat'?'%':trendType==='sleep'?'':'kg';
+  const fmt=v=>trendType==='sleep'?(Math.floor(v/60)+'h'+(v%60)+'m'):v+unit;
+  const ch=vals[vals.length-1].v-vals[0].v;
+  $('#trendStat').textContent=`${vals[0].date}→${vals[vals.length-1].date}：${fmt(vals[0].v)} → ${fmt(vals[vals.length-1].v)}（${ch>0?'+':''}${trendType==='sleep'?fmt(Math.abs(ch)).replace(/^/,ch>0?'+':'-'):ch+unit}）`;
+}
+$$('#trendFilters .filter-chip').forEach(f=>f.onclick=()=>{
+  trendType=f.dataset.t;$$('#trendFilters .filter-chip').forEach(x=>x.classList.remove('active'));f.classList.add('active');renderTrend();
+});
+renderBody();renderFood();renderWater();renderSleep();renderTrend();
+</script>
+</body>
+</html>
