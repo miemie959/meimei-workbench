@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#7c5cff">
+<meta name="theme-color" content="#3b82f6">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="咩咩工作台">
 <link rel="manifest" href="./manifest.json">
@@ -12,19 +12,21 @@
 <title>咩咩的工作台</title>
 <style>
   :root{
-    --bg:#f5f3ff; --card:#ffffff; --primary:#7c5cff; --primary-soft:#ede9fe;
-    --accent:#ff8fab; --accent-soft:#ffe3ec; --green:#21bf73; --green-soft:#e3f9ee;
-    --red:#ff5d6c; --red-soft:#ffe8ea; --text:#2b2b3a; --text-soft:#8a8aa0;
-    --line:#ececf3; --shadow:0 6px 20px rgba(124,92,255,.10); --radius:18px;
+    --bg:#eef4fb; --card:#ffffff; --primary:#3b82f6; --primary-soft:#e3f0ff;
+    --accent:#22d3ee; --accent-soft:#e0f7fb; --green:#10b981; --green-soft:#e3f9f0;
+    --red:#f43f5e; --red-soft:#ffe8ec; --text:#1e293b; --text-soft:#7c8aa0;
+    --line:#e6eef7; --shadow:0 8px 24px rgba(59,130,246,.12); --radius:18px;
+    --blue-deep:#1d4ed8; --blue-soft2:#dbeafe;
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{margin:0;padding:0;}
   body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue","Microsoft YaHei",sans-serif;
     background:var(--bg);color:var(--text);max-width:480px;margin:0 auto;padding-bottom:84px;-webkit-font-smoothing:antialiased;}
-  .app-head{position:sticky;top:0;z-index:20;background:linear-gradient(135deg,#7c5cff,#a78bfa);color:#fff;
-    padding:18px 18px 14px;border-radius:0 0 24px 24px;box-shadow:0 8px 20px rgba(124,92,255,.25);}
+  .app-head{position:sticky;top:0;z-index:20;background:linear-gradient(135deg,#3b82f6,#22d3ee);color:#fff;
+    padding:18px 18px 14px;border-radius:0 0 24px 24px;box-shadow:0 8px 20px rgba(59,130,246,.28);}
   .app-head h1{font-size:20px;margin:0;display:flex;align-items:center;gap:8px;}
   .app-head .sub{font-size:12px;opacity:.92;margin-top:4px;}
+  .head-deco{position:absolute;top:6px;right:10px;width:72px;height:72px;opacity:.9;pointer-events:none;}
   .sheep{font-size:24px;}
   .date-bar{display:flex;align-items:center;justify-content:space-between;margin-top:12px;
     background:rgba(255,255,255,.18);border-radius:14px;padding:8px 12px;font-size:13px;}
@@ -45,7 +47,7 @@
   .tab.active{color:var(--primary);}
   .tab.active .ti{transform:scale(1.18);}
   .btn{border:none;border-radius:12px;padding:11px 16px;font-size:14px;font-weight:600;cursor:pointer;transition:.15s;font-family:inherit;}
-  .btn-primary{background:var(--primary);color:#fff;box-shadow:0 4px 12px rgba(124,92,255,.3);}
+  .btn-primary{background:var(--primary);color:#fff;box-shadow:0 4px 12px rgba(59,130,246,.3);}
   .btn-primary:active{transform:scale(.97);}
   .btn-ghost{background:var(--primary-soft);color:var(--primary);}
   .btn-sm{padding:7px 12px;font-size:12px;border-radius:10px;}
@@ -54,7 +56,7 @@
   .tag{display:inline-block;font-size:11px;padding:2px 9px;border-radius:20px;background:var(--primary-soft);color:var(--primary);}
   .tag.g{background:var(--green-soft);color:var(--green);}
   .tag.r{background:var(--red-soft);color:var(--red);}
-  .tag.a{background:var(--accent-soft);color:#e15a7d;}
+  .tag.a{background:var(--accent-soft);color:#0e7490;}
   input,select,textarea{width:100%;border:1px solid var(--line);border-radius:11px;padding:10px 12px;
     font-size:14px;font-family:inherit;background:#fafaff;color:var(--text);outline:none;}
   input:focus,select:focus,textarea:focus{border-color:var(--primary);background:#fff;}
@@ -83,7 +85,7 @@
   .workout-info .wm{font-size:11px;margin-top:4px;}
   .rest-badge{background:var(--green-soft);color:var(--green);padding:2px 8px;border-radius:8px;font-size:11px;}
   .progress-line{height:8px;background:var(--primary-soft);border-radius:6px;overflow:hidden;margin-top:4px;}
-  .progress-line i{display:block;height:100%;background:linear-gradient(90deg,#7c5cff,#a78bfa);border-radius:6px;transition:.4s;}
+  .progress-line i{display:block;height:100%;background:linear-gradient(90deg,#3b82f6,#22d3ee);border-radius:6px;transition:.4s;}
   /* english */
   .app-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);}
   .app-item:last-child{border-bottom:none;}
@@ -137,6 +139,15 @@
   .seg button{flex:1;border:none;background:transparent;border-radius:9px;padding:9px;font-size:13px;font-weight:600;
     color:var(--text-soft);cursor:pointer;font-family:inherit;}
   .seg button.on{background:#fff;color:var(--primary);box-shadow:0 2px 6px rgba(0,0,0,.06);}
+  /* 历史数据弹窗 */
+  .hist-row{display:flex;align-items:center;justify-content:space-between;padding:11px 12px;border-radius:12px;background:var(--bg-soft);margin-bottom:8px;}
+  .hist-date{font-size:13px;font-weight:700;color:var(--text);}
+  .hist-date small{display:block;font-weight:400;color:var(--text-soft);font-size:11px;margin-top:2px;}
+  .hist-val{font-size:14px;font-weight:700;text-align:right;}
+  .hist-val small{display:block;font-weight:400;color:var(--text-soft);font-size:11px;margin-top:2px;}
+  .hist-empty{text-align:center;color:var(--text-soft);font-size:13px;padding:28px 0;}
+  .video-btn{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#fff;background:#fb7299;border:none;border-radius:20px;padding:5px 12px;cursor:pointer;font-family:inherit;text-decoration:none;}
+  .video-btn:active{opacity:.8;}
   .note{font-size:11px;color:var(--text-soft);margin-top:6px;line-height:1.6;}
   .badge-sync{font-size:10px;background:rgba(255,255,255,.25);padding:2px 7px;border-radius:8px;}
   .hint{background:var(--accent-soft);color:#c44d72;font-size:12px;padding:9px 12px;border-radius:11px;margin-bottom:12px;line-height:1.6;}
@@ -146,8 +157,23 @@
 <body>
 
 <div class="app-head">
+  <div class="head-deco" aria-hidden="true">
+    <svg viewBox="0 0 100 100" width="100%" height="100%">
+      <circle cx="50" cy="50" r="48" fill="#ffffff" opacity="0.18"/>
+      <circle cx="50" cy="42" r="20" fill="#fff"/>
+      <path d="M30 40 q-6 -22 10 -20 q4 8 -2 14 q-6 2 -8 6z" fill="#3b82f6"/>
+      <path d="M70 40 q6 -22 -10 -20 q-4 8 2 14 q6 2 8 6z" fill="#3b82f6"/>
+      <circle cx="43" cy="42" r="3" fill="#1e293b"/>
+      <circle cx="57" cy="42" r="3" fill="#1e293b"/>
+      <path d="M45 50 q5 5 10 0" stroke="#f43f5e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <circle cx="38" cy="48" r="3.5" fill="#22d3ee" opacity=".7"/>
+      <circle cx="62" cy="48" r="3.5" fill="#22d3ee" opacity=".7"/>
+      <path d="M38 70 q12 -10 24 0 l0 18 q-12 8 -24 0z" fill="#22d3ee"/>
+      <rect x="34" y="60" width="32" height="22" rx="8" fill="#fff" opacity=".9"/>
+    </svg>
+  </div>
   <h1><span class="sheep">🐑</span> 咩咩的工作台</h1>
-  <div class="sub">减脂塑型 · 每日英语 · 求职推荐 · 收支账单</div>
+  <div class="sub">减脂塑型 · 每日英语 · 收支账单 · 健康生活</div>
   <div class="date-bar">
     <div>📅 <b id="todayStr">--</b> <span id="weekday" style="color:#fff;opacity:.9"></span></div>
     <div class="mini-stats">
@@ -162,7 +188,7 @@
 <!-- 健身计划 -->
 <section class="section active" id="sec-fit">
   <div class="card">
-    <div class="card-title"><span class="ico">🔥</span> 一周减脂塑型计划 <span class="tag" style="margin-left:auto">女生专属</span></div>
+    <div class="card-title"><span class="ico">🔥</span> 一周减脂塑型计划 <span class="tag" style="margin-left:auto">女生专属</span><button class="btn btn-ghost btn-sm hist-open" data-sec="fit" style="margin-left:8px;padding:5px 10px">📊 历史</button></div>
     <div class="hint">🎯 双线并行：抖音直播跳操「东北赵又廷（减脂又塑形）」每周 4-5 次燃脂 + 健身房力量训练每周 3-4 次（按 <b>肩胸→背→腹→臀腿</b> 分部位）。点击 ○ 打卡；✎ 可编辑/删除/添加动作；每天底部还能<b>整体对调</b>到另一天（如周一肩胸 ↔ 周三背部）。</div>
     <div class="day-tabs" id="dayTabs"></div>
     <div id="weekOverview" style="display:flex;gap:4px;flex-wrap:wrap;margin:6px 0 2px"></div>
@@ -174,7 +200,7 @@
         <span>🔥 今日消耗总热量</span>
         <span><b id="fitKcalDone" style="color:var(--accent);font-size:15px">0</b> <span style="color:var(--text-soft)">/ <span id="fitKcalTotal">0</span> kcal</span></span>
       </div>
-      <div class="progress-line" style="margin-top:5px"><i id="fitKcalBar" style="width:0%;background:linear-gradient(90deg,#ff8fab,#ff5d6c)"></i></div>
+      <div class="progress-line" style="margin-top:5px"><i id="fitKcalBar" style="width:0%;background:linear-gradient(90deg,#22d3ee,#f43f5e)"></i></div>
       <div class="note">🔥 热量为网络公开数据按约55-60kg女性中等强度估算，实际因体重/强度而异，供参考。</div>
     </div>
   </div>
@@ -190,7 +216,7 @@
 <!-- 每日英语 -->
 <section class="section" id="sec-eng">
   <div class="card">
-    <div class="card-title"><span class="ico">📚</span> 手机 APP 英语训练 <span class="tag" style="margin-left:auto">每日 30-45min</span></div>
+    <div class="card-title"><span class="ico">📚</span> 手机 APP 英语训练 <span class="tag" style="margin-left:auto">每日 30-45min</span><button class="btn btn-ghost btn-sm hist-open" data-sec="eng" style="margin-left:8px;padding:5px 10px">📊 历史</button></div>
     <div class="hint">🦉 以<b>多邻国 Duolingo</b>为主（每日闯关课程+复习），辅以<b>流利说</b>练口语跟读。每天按顺序完成并打卡；点 ✎ 可<b>编辑/删除/添加</b>任务与APP，按你当天情况自由调整。</div>
     <div id="engApps"></div>
   </div>
@@ -210,21 +236,10 @@
   </div>
 </section>
 
-<!-- 工作求职 -->
-<section class="section" id="sec-job">
-  <div class="card">
-    <div class="card-title"><span class="ico">💼</span> 求职推荐 <span class="badge-sync" id="jobSync">本地库</span></div>
-    <div class="hint">📍 中心：<b>和顺洋湖壹号</b> · 辐射 <b>8 公里</b> · 匹配：活动策划执行 / 行政教务 · 薪资 4k+ · 社保 · 双休/大小休</div>
-    <div class="filter-bar" id="jobFilters"></div>
-    <div id="jobList"></div>
-    <button class="btn btn-primary btn-block" id="jobRefresh" style="margin-top:8px">🔄 重新生成今日推荐（5-8个）</button>
-  </div>
-</section>
-
 <!-- 每日账单 -->
 <section class="section" id="sec-bill">
   <div class="card">
-    <div class="card-title"><span class="ico">💰</span> 收支总况 <span class="tag" style="margin-left:auto" id="billMonth"></span></div>
+    <div class="card-title"><span class="ico">💰</span> 收支总况 <span class="tag" style="margin-left:auto" id="billMonth"></span><button class="btn btn-ghost btn-sm hist-open" data-sec="bill" style="margin-left:8px;padding:5px 10px">📊 历史</button></div>
     <div class="summary">
       <div class="sum-box in"><div class="sl">收入</div><div class="sv" id="sumIn">¥0</div></div>
       <div class="sum-box out"><div class="sl">支出</div><div class="sv" id="sumOut">¥0</div></div>
@@ -250,7 +265,7 @@
 <!-- 健康生活 -->
 <section class="section" id="sec-health">
   <div class="card">
-    <div class="card-title"><span class="ico">📏</span> 身体数据 <span class="tag" style="margin-left:auto">可手动调整</span></div>
+    <div class="card-title"><span class="ico">📏</span> 身体数据 <span class="tag" style="margin-left:auto">可手动调整</span><button class="btn btn-ghost btn-sm hist-open" data-sec="health" style="margin-left:8px;padding:5px 10px">📊 历史</button></div>
     <div class="row">
       <div><label>身高(cm)</label><input type="number" id="bdHeight" inputmode="decimal" placeholder="160"></div>
       <div><label>体重(kg)</label><input type="number" id="bdWeight" inputmode="decimal" placeholder="55"></div>
@@ -279,7 +294,7 @@
   </div>
 
   <div class="card">
-    <div class="card-title"><span class="ico">🍱</span> 今日饮食食谱 <span class="tag" style="margin-left:auto" id="foodDate"></span></div>
+    <div class="card-title"><span class="ico">🍱</span> 今日饮食食谱 <span class="tag" style="margin-left:auto" id="foodDate"></span><button class="btn btn-ghost btn-sm hist-open" data-sec="food" style="margin-left:8px;padding:5px 10px">📊 历史</button></div>
     <div id="foodList"></div>
     <button class="btn btn-ghost btn-block" id="foodAdd" style="margin-top:8px">➕ 添加一餐</button>
     <div style="margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)">
@@ -287,7 +302,7 @@
         <span>🔥 今日热量摄入</span>
         <span><b id="foodKcal" style="color:var(--accent);font-size:17px">0</b> <span style="color:var(--text-soft)">kcal（目标 <span id="foodTarget">1500</span>）</span></span>
       </div>
-      <div class="progress-line" style="margin-top:5px"><i id="foodKcalBar" style="width:0%;background:linear-gradient(90deg,#ff8fab,#ff5d6c)"></i></div>
+      <div class="progress-line" style="margin-top:5px"><i id="foodKcalBar" style="width:0%;background:linear-gradient(90deg,#22d3ee,#f43f5e)"></i></div>
       <div class="note">🔥 单餐热量按食物名称网络检索常见值估算（约55-60kg女性减脂参考），可在添加时手动修正。</div>
     </div>
   </div>
@@ -298,7 +313,7 @@
       <div class="sum-box bal"><div class="sl">已喝</div><div class="sv" id="waterMl">0 ml</div></div>
       <div class="sum-box bal"><div class="sl">杯数</div><div class="sv" id="waterCups">0 杯</div></div>
     </div>
-    <div class="progress-line"><i id="waterBar" style="width:0%;background:linear-gradient(90deg,#7c5cff,#a78bfa)"></i></div>
+    <div class="progress-line"><i id="waterBar" style="width:0%;background:linear-gradient(90deg,#3b82f6,#22d3ee)"></i></div>
     <div class="note" style="margin:6px 0 10px">目标 8 杯（1600ml）。每杯 200ml。</div>
     <div class="row">
       <button class="btn btn-primary" id="waterAdd" style="flex:1">➕ 喝一杯(200ml)</button>
@@ -340,7 +355,6 @@
 <div class="tabbar">
   <div class="tab active" data-sec="sec-fit"><span class="ti">🔥</span>健身</div>
   <div class="tab" data-sec="sec-eng"><span class="ti">📚</span>英语</div>
-  <div class="tab" data-sec="sec-job"><span class="ti">💼</span>求职</div>
   <div class="tab" data-sec="sec-bill"><span class="ti">💰</span>账单</div>
   <div class="tab" data-sec="sec-health"><span class="ti">🌿</span>健康</div>
 </div>
@@ -386,6 +400,8 @@
     <input type="text" id="fitGroup" placeholder="如：肩胸 / 背 / 腹 / 臀腿 / 有氧 / 恢复">
     <label>动作指导 / 跟练要点（选填）</label>
     <textarea id="fitTip" rows="3" placeholder="写清发力点、组数节奏、易错点"></textarea>
+    <label>跟练视频链接（选填，可填抖音/小红书/B站等，填了优先用）</label>
+    <input type="text" id="fitVideo" placeholder="如：https://v.douyin.com/xxxx/ 或 小红书/哔哩哔哩视频页链接">
     <button class="btn btn-primary btn-block" id="fitSave" style="margin-top:16px">保存</button>
   </div>
 </div>
@@ -400,6 +416,38 @@
     <label>使用 APP</label>
     <input type="text" id="engTaskApp" placeholder="如：多邻国 Duolingo / 流利说">
     <button class="btn btn-primary btn-block" id="engTaskSave" style="margin-top:16px">保存</button>
+  </div>
+</div>
+
+<!-- 饮食记录弹窗（新增/编辑共用，预填已有内容） -->
+<div class="modal-mask" id="foodModal">
+  <div class="modal">
+    <span class="close" id="foodModalClose">×</span>
+    <h3 id="foodModalTitle">添加一餐</h3>
+    <label>记录内容（格式：备注 食物名+克数，如 午餐 牛肉100g+米饭100g）</label>
+    <textarea id="foodInput" rows="3" placeholder="午餐 牛肉100g+米饭100g+西兰花100g"></textarea>
+    <div class="note" style="margin:6px 0 0">在原内容上直接修改即可，保存后覆盖本条。</div>
+    <button class="btn btn-primary btn-block" id="foodSave" style="margin-top:14px">保存</button>
+  </div>
+</div>
+
+<!-- 历史数据弹窗 -->
+<div class="modal-mask" id="histModal">
+  <div class="modal">
+    <span class="close" id="histModalClose">×</span>
+    <h3>📊 历史数据（每日总量）</h3>
+    <div class="seg" id="histRange" style="margin-bottom:8px">
+      <button data-r="week" class="on">📅 本周(近7天)</button>
+      <button data-r="month">📆 本月</button>
+    </div>
+    <div class="seg" id="histSeg">
+      <button data-s="fit" class="on">🔥 健身</button>
+      <button data-s="eng">📚 英语</button>
+      <button data-s="bill">💰 账单</button>
+      <button data-s="food">🍱 饮食</button>
+      <button data-s="health">🌿 健康</button>
+    </div>
+    <div id="histBody" style="margin-top:12px"></div>
   </div>
 </div>
 
@@ -432,7 +480,6 @@ $$('.tab').forEach(t=>t.onclick=()=>{
   t.classList.add('active');
   $('#'+t.dataset.sec).classList.add('active');
   if(t.dataset.sec==='sec-bill')renderBill();
-  if(t.dataset.sec==='sec-job')renderJobs();
   if(t.dataset.sec==='sec-health'){renderBody();renderFood();renderWater();renderSleep();renderTrend();}
 });
 
@@ -451,9 +498,10 @@ const FIT_DEFAULT=[
     {n:'哑铃侧平举',d:'3组×15次 · 小重量控节奏',m:'力量',g:'肩胸',tip:'手微握杯状，肘略高于腕，抬到与肩同高即可，避免借力甩。'},
     {n:'赵又廷直播跳操（跟练）',d:'30-40分钟 · 当晚或清晨跟直播',m:'跳操',g:'有氧',tip:'抖音搜「东北赵又廷（减脂又塑形）」直播间，跟着跳完整场，心率保持微喘能说话。'},
   ]},
-  {day:1,name:'周二',type:'跳操',focus:'全身燃脂',title:'赵又廷直播跳操日',live:true,items:[
-    {n:'赵又廷直播跳操（跟练）',d:'45-60分钟 · 全程跟直播',m:'跳操',g:'有氧',tip:'抖音搜「东北赵又廷（减脂又塑形）」开播即跟，动作跟不上就小幅度跟，保心率不保标准。'},
-    {n:'跳后拉伸',d:'10分钟 · 重点腿+腰',m:'恢复',g:'恢复',tip:'大腿前侧、小腿、腰部各拉伸30秒，缓解跳操后肌肉紧绷。'},
+  {day:1,name:'周二',type:'跳操',focus:'全身燃脂',title:'赵又廷直播跳操 + 超模机',live:true,items:[
+    {n:'赵又廷直播跳操（跟练）',d:'30-40分钟 · 全程跟直播',m:'跳操',g:'有氧',tip:'抖音搜「东北赵又廷（减脂又塑形）」开播即跟，动作跟不上就小幅度跟，保心率不保标准。'},
+    {n:'超模机（混氧训练）',d:'45分钟 · 高强度混氧，强度较大',m:'有氧',g:'混氧',tip:'大型综合有氧器械，阻力调中高，保持匀速踩踏+摆臂，心率维持在燃脂上限区间，强度较大注意补水。'},
+    {n:'跳后拉伸',d:'10分钟 · 重点腿+腰',m:'恢复',g:'恢复',tip:'大腿前侧、小腿、腰部各拉伸30秒，缓解训练后肌肉紧绷。'},
   ]},
   {day:2,name:'周三',type:'力量',focus:'背部',title:'健身房·背部日',live:false,items:[
     {n:'高位下拉',d:'4组×12次 · 挺胸沉肩',m:'力量',g:'背',tip:'握距略宽于肩，下拉时肘部向后下方，想象用肘把重量拉下，顶峰夹背。'},
@@ -461,8 +509,9 @@ const FIT_DEFAULT=[
     {n:'哑铃单臂划船',d:'每侧3组×12次',m:'力量',g:'背',tip:'一手撑凳，另一手沿腿侧上提至腰侧，身体稳住不扭，练背厚度。'},
     {n:'赵又廷直播跳操（跟练）',d:'20-30分钟 · 轻量有氧',m:'跳操',g:'有氧',tip:'背部训练后再跟一小场跳操，进一步燃脂，量力而行。'},
   ]},
-  {day:3,name:'周四',type:'跳操',focus:'全身燃脂',title:'赵又廷直播跳操日',live:true,items:[
-    {n:'赵又廷直播跳操（跟练）',d:'45-60分钟 · 全程跟直播',m:'跳操',g:'有氧',tip:'第二天跳操注意补水，中间休息不超过30秒，保持燃脂心率区间。'},
+  {day:3,name:'周四',type:'跳操',focus:'全身燃脂',title:'赵又廷直播跳操 + 超模机',live:true,items:[
+    {n:'赵又廷直播跳操（跟练）',d:'30-40分钟 · 全程跟直播',m:'跳操',g:'有氧',tip:'第二天跳操注意补水，中间休息不超过30秒，保持燃脂心率区间。'},
+    {n:'超模机（混氧训练）',d:'45分钟 · 高强度混氧，强度较大',m:'有氧',g:'混氧',tip:'大型综合有氧器械，阻力调中高，匀速踩踏+摆臂，心率维持燃脂上限，强度较大，量力调整阻力。'},
     {n:'泡沫轴放松',d:'10分钟 · 重点背+腿',m:'恢复',g:'恢复',tip:'用泡沫轴缓慢滚压背部、大腿，每个痛点停留20秒。'},
   ]},
   {day:4,name:'周五',type:'力量',focus:'腹部',title:'健身房·腹部核心日',live:false,items:[
@@ -504,6 +553,7 @@ function estKcal(it){
   const groups=grpM?parseInt(grpM[1]):0;
   if(m==='跳操'){const base=mins?mins:50;return Math.round(base*5.6);} // 约5.6kcal/min
   if(m==='有氧'){
+    if(/超模机|混氧/.test(n))return Math.round((mins||45)*10); // 强度较大 ~10kcal/min
     if(/跳绳/.test(n))return Math.round((mins||30)*7);   // ~7kcal/min
     if(/慢跑|跑步/.test(n))return Math.round((mins||30)*9.3); // ~9.3kcal/min
     if(/骑车|游泳|骑行/.test(n))return Math.round((mins||30)*8);
@@ -563,12 +613,16 @@ function renderFitDay(i){
     return `<div class="workout">
       <div class="chk${isDone?' done':''}" data-id="${it.id}">${isDone?'✓':''}</div>
       <div class="workout-info">
-        <div class="wn">${it.n} ${isLive?'<span class="rest-badge" style="background:var(--accent-soft);color:#e15a7d">直播</span>':''}</div>
+        <div class="wn">${it.n} ${isLive?'<span class="rest-badge" style="background:var(--accent-soft);color:#0e7490">直播</span>':''}</div>
         <div class="wd">${it.d}</div>
         <div class="wm"><span class="tag ${tagCls}">${it.m}</span> <span class="tag">${FOCUS_TAG[it.g]||it.g}</span> <span class="tag a">🔥 约${it.kcal} kcal</span></div>
         ${it.tip?`<details style="margin-top:7px"><summary style="font-size:12px;color:var(--primary);cursor:pointer">▸ 动作指导 / 跟练要点</summary>
           <div style="font-size:12px;color:var(--text-soft);line-height:1.7;margin-top:5px;background:var(--primary-soft);padding:9px 11px;border-radius:10px">${it.tip}</div></details>`:''}
-        <div class="wm" style="margin-top:8px;justify-content:flex-end;display:flex;gap:8px">
+        <div class="wm" style="margin-top:8px;justify-content:flex-end;display:flex;flex-wrap:wrap;gap:8px">
+          ${it.video?`<a class="video-btn" href="${it.video}" target="_blank" rel="noopener">▶ 跟练视频</a>`
+            :`<a class="video-btn" style="background:#161823" href="https://www.douyin.com/search/${encodeURIComponent(it.n+' 健身教学')}" target="_blank" rel="noopener">抖</a>
+               <a class="video-btn" style="background:#ff2442" href="https://www.xiaohongshu.com/search_result?keyword=${encodeURIComponent(it.n+' 健身教学')}" target="_blank" rel="noopener">书</a>
+               <a class="video-btn" href="https://search.bilibili.com/all?keyword=${encodeURIComponent(it.n+' 健身教学')}" target="_blank" rel="noopener">B</a>`}
           <span class="fit-edit btn btn-sm btn-ghost" data-act="edit" data-id="${it.id}" style="padding:5px 12px">✎ 编辑</span>
           <span class="fit-edit btn btn-sm btn-danger" data-act="del" data-id="${it.id}">🗑 删除</span>
         </div>
@@ -632,10 +686,10 @@ function fitEditModal(day,id){
     $('#fitModalTitle').textContent='编辑动作';
     $('#fitName').value=it.n;$('#fitDesc').value=it.d;
     $('#fitType').value=it.m==='跳操'?'跳操':it.m==='有氧'?'有氧':it.m==='恢复'?'恢复':'力量';
-    $('#fitGroup').value=it.g;$('#fitTip').value=it.tip||'';
+    $('#fitGroup').value=it.g;$('#fitTip').value=it.tip||'';$('#fitVideo').value=it.video||'';
   }else{
     $('#fitModalTitle').textContent='添加动作 · '+p.name;
-    $('#fitName').value='';$('#fitDesc').value='';$('#fitType').value='力量';$('#fitGroup').value='';$('#fitTip').value='';
+    $('#fitName').value='';$('#fitDesc').value='';$('#fitType').value='力量';$('#fitGroup').value='';$('#fitTip').value='';$('#fitVideo').value='';
   }
   $('#fitModal').classList.add('show');
 }
@@ -646,10 +700,11 @@ $('#fitSave').onclick=()=>{
   const d=$('#fitDesc').value.trim();const m=$('#fitType').value;
   const g=$('#fitGroup').value.trim()||(m==='跳操'?'有氧':m==='恢复'?'恢复':'力量');
   const tip=$('#fitTip').value.trim();
+  const video=$('#fitVideo').value.trim();
   const p=FIT_PLAN[fitEditDay];
   const kcal=estKcal({n,d,m,g,tip});
-  if(fitEditId){const it=p.items.find(x=>x.id===fitEditId);Object.assign(it,{n,d,m,g,tip,kcal});}
-  else p.items.push({id:'f'+Math.random().toString(36).slice(2,9),n,d,m,g,tip,kcal});
+  if(fitEditId){const it=p.items.find(x=>x.id===fitEditId);Object.assign(it,{n,d,m,g,tip,video,kcal});}
+  else p.items.push({id:'f'+Math.random().toString(36).slice(2,9),n,d,m,g,tip,video,kcal});
   LS('fit_plan',FIT_PLAN);$('#fitModal').classList.remove('show');renderFitDay(fitEditDay);renderFitWeek();toast('已保存');
 };
 $('#fitResetDefault').onclick=()=>{
@@ -663,8 +718,8 @@ renderFitTabs();renderFitWeek();
 
 /* ============ 每日英语 ============ */
 let engApps=LS('eng_apps')||[
-  {name:'多邻国 Duolingo',ico:'🦉',color:'#e3f9ee',desc:'主阵地：每日打卡课程+复习，游戏化闯关'},
-  {name:'英语流利说',ico:'🗣️',color:'#ede9fe',desc:'辅练：跟读模仿，纠发音练口语语调'},
+  {name:'多邻国 Duolingo',ico:'🦉',color:'#e3f9f0',desc:'主阵地：每日打卡课程+复习，游戏化闯关'},
+  {name:'英语流利说',ico:'🗣️',color:'#e3f0ff',desc:'辅练：跟读模仿，纠发音练口语语调'},
 ];
 let engTasks=LS('eng_tasks')||[
   {n:'多邻国 完成 1 节课程 + 复习',app:'多邻国 Duolingo',done:false},
@@ -706,7 +761,7 @@ function renderEng(){
     const name=prompt('APP 名称（可加emoji图标，如 🦉多邻国）：');
     if(!name)return;
     const desc=prompt('一句话说明用法：','每日打卡')||'';
-    engApps.push({name,ico:name.match(/^\P{ASCII}/u)?name[0]:'📱',color:'#ede9fe',desc});LS('eng_apps',engApps);renderEng();toast('已添加');
+    engApps.push({name,ico:name.match(/^\P{ASCII}/u)?name[0]:'📱',color:'#e3f0ff',desc});LS('eng_apps',engApps);renderEng();toast('已添加');
   };
   $('#engTaskAdd').onclick=()=>engTaskModal(null);
   // 每日英语学习时长
@@ -750,92 +805,6 @@ function renderEngStat(){
   $('#msEngDur').textContent='⏱️ '+tm+'min';
 }
 renderEng();renderEngStat();
-
-/* ============ 工作求职 ============ */
-const HOME={lat:28.1280,lng:112.9350}; // 和顺洋湖壹号 近似坐标(长沙洋湖片区)
-function dist(a,b){ // 简单线性近似，1经纬度≈111km
-  const dx=(a.lat-b.lat)*111,dy=(a.lng-b.lng)*111*Math.cos(a.lat*Math.PI/180);
-  return Math.sqrt(dx*dx+dy*dy);
-}
-// 职位库（围绕洋湖/含浦/湘江新区片区模拟真实公司点位）
-const JOB_POOL=[
-  {t:'活动执行专员',co:'湖南洋湖文化传媒有限公司',lat:28.130,lng:112.938,salary:'4.5-6k',type:'活动策划',social:true,rest:'双休',exp:'1年',kw:['活动','执行','策划']},
-  {t:'行政教务老师',co:'美吉姆国际早教(洋湖中心)',lat:28.126,lng:112.932,salary:'4-5k',type:'行政教务',social:true,rest:'大小休',exp:'经验优先',kw:['行政','教务','排课','早教']},
-  {t:'行政专员',co:'长沙湘江新区某科技公司',lat:28.135,lng:112.940,salary:'4-5.5k',type:'行政',social:true,rest:'双休',exp:'1年',kw:['行政','考勤','数据']},
-  {t:'活动策划专员',co:'湖南悦动会展服务有限公司',lat:28.122,lng:112.945,salary:'5-7k',type:'活动策划',social:true,rest:'大小休',exp:'1-2年',kw:['活动','策划','执行']},
-  {t:'门店运营督导',co:'洋湖商圈某连锁餐饮',lat:28.131,lng:112.930,salary:'4.5-6k',type:'运营',social:true,rest:'大小休',exp:'1年',kw:['门店','运营','管理']},
-  {t:'教务主管',co:'含浦艺术培训中心',lat:28.118,lng:112.920,salary:'4.5-6k',type:'行政教务',social:true,rest:'双休',exp:'2年',kw:['教务','排课','行政']},
-  {t:'市场推广专员',co:'洋湖万达某教育品牌',lat:28.128,lng:112.936,salary:'4-6k',type:'市场',social:true,rest:'大小休',exp:'经验优先',kw:['市场','推广','活动']},
-  {t:'行政前台',co:'长沙智谷企业服务公司',lat:28.140,lng:112.948,salary:'4-4.5k',type:'行政',social:true,rest:'双休',exp:'应届可',kw:['行政','前台','考勤']},
-  {t:'活动运营助理',co:'湖南广电周边某MCN',lat:28.150,lng:112.960,salary:'5-7k',type:'活动策划',social:true,rest:'大小休',exp:'1年',kw:['活动','运营','策划']},
-  {t:'仓库物资管理',co:'洋湖某零售企业',lat:28.124,lng:112.928,salary:'4-5k',type:'行政',social:true,rest:'单休可谈',exp:'经验优先',kw:['仓库','盘点','采买']},
-  {t:'课程顾问',co:'岳麓区某素质教育机构',lat:28.115,lng:112.915,salary:'4-8k',type:'教务销售',social:true,rest:'大小休',exp:'经验优先',kw:['教务','顾问','早教']},
-  {t:'策划执行（兼职可转）',co:'长沙某婚庆活动工作室',lat:28.133,lng:112.942,salary:'按项目4-8k',type:'活动策划',social:false,rest:'弹性',exp:'经验优先',kw:['活动','策划','执行']},
-  {t:'人事行政助理',co:'湘江新区产业园企业',lat:28.142,lng:112.952,salary:'4.5-5.5k',type:'行政',social:true,rest:'双休',exp:'1年',kw:['人事','行政','考勤','周报']},
-  {t:'校区运营专员',co:'岳麓区连锁教培机构',lat:28.110,lng:112.910,salary:'4.5-6k',type:'运营',social:true,rest:'大小休',exp:'1年',kw:['运营','教务','门店']},
-  {t:'活动主持/执行',co:'洋湖湿地公园活动公司',lat:28.127,lng:112.934,salary:'5-6k',type:'活动策划',social:true,rest:'大小休',exp:'经验优先',kw:['活动','执行','策划']},
-  {t:'数据录入/统计文员',co:'含浦某电商公司',lat:28.116,lng:112.918,salary:'4-4.8k',type:'行政',social:true,rest:'双休',exp:'应届可',kw:['数据','统计','行政']},
-];
-const RESUME_KW=['活动','策划','执行','行政','教务','排课','运营','门店','考勤','数据','仓库','早教','市场'];
-let jobFilter='全部';
-function matchScore(j){
-  let s=0;
-  RESUME_KW.forEach(k=>{if(j.kw.includes(k))s+=18;});
-  // 距离加分（越近越高）
-  const d=dist(HOME,{lat:j.lat,lng:j.lng});
-  s+=Math.max(0,30-d*4);
-  if(j.social)s+=8;
-  if(j.rest.includes('双休'))s+=6;else if(j.rest.includes('大小休'))s+=4;
-  return {score:Math.round(s),dist:d};
-}
-let jobToday=LS('job_today')||null;
-let jobDate=LS('job_date')||'';
-function genJobs(){
-  const scored=JOB_POOL.map(j=>({...j,...matchScore(j)}))
-    .filter(j=>j.dist<=8) // 8公里辐射
-    .sort((a,b)=>b.score-a.score);
-  const n=Math.min(8,Math.max(5,Math.floor(Math.random()*4)+5));
-  // 取前若干，但保证覆盖活动+行政两类
-  const act=scored.filter(j=>j.type.includes('活动'));
-  const adm=scored.filter(j=>!j.type.includes('活动'));
-  let pick=[];
-  pick.push(...act.slice(0,Math.ceil(n/2)));
-  pick.push(...adm.slice(0,Math.floor(n/2)));
-  // 补足到n
-  for(const j of scored){if(pick.length>=n)break;if(!pick.includes(j))pick.push(j);}
-  pick=pick.slice(0,n).sort((a,b)=>a.dist-b.dist);
-  jobToday=pick;jobDate=today();LS('job_today',jobToday);LS('job_date',jobDate);
-}
-function renderJobFilters(){
-  const cats=['全部','活动策划','行政教务','运营','市场'];
-  $('#jobFilters').innerHTML=cats.map(c=>
-    `<div class="filter-chip${c===jobFilter?' active':''}" data-c="${c}">${c}</div>`).join('');
-  $$('#jobFilters .filter-chip').forEach(f=>f.onclick=()=>{jobFilter=f.dataset.c;renderJobFilters();renderJobs();});
-}
-function renderJobs(){
-  if(jobDate!==today()||!jobToday)genJobs();
-  const list=(jobToday||[]).filter(j=>jobFilter==='全部'||j.type.includes(jobFilter==='活动策划'?'活动':jobFilter==='行政教务'?'教务':jobFilter));
-  $('#jobList').innerHTML=list.length?list.map(j=>
-    `<div class="job-card">
-      <div class="job-top">
-        <div><div class="job-title">${j.t}</div><div class="job-co">🏢 ${j.co}</div></div>
-        <div class="job-match">匹配 ${j.score}</div>
-      </div>
-      <div class="job-meta">
-        <span class="tag">💰 ${j.salary}</span>
-        <span class="tag ${j.social?'g':'r'}">${j.social?'五险':'社保面议'}</span>
-        <span class="tag a">${j.rest}</span>
-        <span class="tag">📅 ${j.exp}</span>
-      </div>
-      <div class="job-foot">
-        <div class="job-dis">📍 距你约 ${j.dist.toFixed(1)} km · ${j.type}</div>
-        <button class="btn btn-ghost btn-sm" data-co="${j.co}" data-t="${j.t}">标记感兴趣</button>
-      </div>
-    </div>`).join(''):'<div class="empty">暂无匹配职位，试试其他筛选</div>';
-  $$('#jobList button').forEach(b=>b.onclick=()=>{toast('已记录：'+b.dataset.t+' @ '+b.dataset.co);});
-}
-$('#jobRefresh').onclick=()=>{genJobs();renderJobs();toast('已重新生成今日推荐');};
-renderJobFilters();renderJobs();
 
 /* ============ 每日账单 ============ */
 let bills=LS('bills')||[];
@@ -1084,7 +1053,12 @@ const FOOD_PER100={
   // 水果类
   '苹果':52,'香蕉':89,'橙子':47,'梨':42,'葡萄':43,'草莓':32,'蓝莓':57,'西瓜':30,'桃子':39,'猕猴桃':61,'柚子':42,'芒果':60,'木瓜':30,
   // 坚果/油脂/其他
-  '坚果':580,'花生':567,'核桃':654,'瓜子':600,'腰果':553,'巴旦木':579,'牛油果':160,'奇亚籽':486,'沙拉':80,'沙拉酱':380,'橄榄油':899,'食用油':899,'披萨':266,'汉堡':292,'火锅':150,'烧烤':180,'零食':500,'水果':60,'代餐':350
+  '坚果':580,'花生':567,'核桃':654,'瓜子':600,'腰果':553,'巴旦木':579,'牛油果':160,'奇亚籽':486,'沙拉':80,'沙拉酱':380,'橄榄油':899,'食用油':899,'披萨':266,'汉堡':292,'火锅':150,'烧烤':180,'零食':500,'水果':60,'代餐':350,
+  // 零食/甜品/饮料（减脂期常见，热量偏高，注意控制）
+  '饼干':435,'曲奇':502,'辣条':420,'薯片':548,'炸薯条':298,'巧克力':546,'黑巧克力':546,'牛奶巧克力':535,'蛋糕':350,'奶油蛋糕':380,'面包干':400,'海苔':170,'果冻':70,'棉花糖':320,'棒棒糖':390,'葡萄糖':320,'葡萄糖浆':310,
+  '奶茶':430,'珍珠奶茶':430,'可乐':43,'雪碧':43,'芬达':47,'果汁':45,'橙汁':45,'苹果汁':46,'咖啡':2,'拿铁':50,'美式':5,'能量饮料':45,'冰激凌':200,'雪糕':210,'布丁':120,'麻薯':300,'蛋黄派':420,'沙琪玛':470,'锅巴':520,'薯条':298,'辣片':420,
+  '葡萄干':299,'红枣':276,'桂圆':313,'桂圆干':313,'芒果干':330,'猕猴桃干':310,'草莓干':320,'香蕉片':520,'蜜饯':330,'糖果':400,'软糖':350,'薄荷糖':390,'芝麻糊':380,'藕粉':370,'麦乳精':390,'炼乳':331,'旺仔牛奶':85,'养乐多':72,'酸奶饮品':70,
+  '方便面':473,'桶装面':450,'自热锅':200,'速食米饭':180,'罐头鱼':120,'午餐肉':229,'火腿肠':212,'香肠':250,'培根':220,'热狗':290,'肉松':330,'鱼丸':150,'贡丸':150,'虾片':540,'米果':490,'仙贝':460,'蛋卷':530,'威化':510,'华夫饼':430,'铜锣烧':390,'甜甜圈':450,'泡芙':430
 };
 // 近似替换表：识别不到时，用相似类别食物的热量替代（避免无法计算）
 const FOOD_SIMILAR={
@@ -1099,13 +1073,20 @@ const FOOD_SIMILAR={
   '酱':'沙拉酱','油':'食用油','脂':'牛油果'
 };
 // 解析 "牛肉100g+米饭100g+蔬菜100g" -> 总热量(kcal)，返回 {kcal, detail}
+// 支持单位：g/克/ml/毫升/杯/包/袋/个/根/片/块/听/瓶/根；无单位默认按 100g(或液体100ml) 计一份
+const UNIT_DEFAULT={杯:350,瓶:500,听:330,包:100,袋:100,个:50,根:80,片:30,块:50};
 function calcFoodKcal(text){
   const segs=text.split(/[+＋,，、\s]+/).map(s=>s.trim()).filter(Boolean);
   let total=0;const parts=[];
   segs.forEach(seg=>{
-    const m=seg.match(/^(.*?)(\d+(?:\.\d+)?)\s*(g|克|ml|毫升)?$/);
+    const m=seg.match(/^(.*?)(\d+(?:\.\d+)?)\s*(g|克|ml|毫升|杯|包|袋|个|根|片|块|听|瓶)?$/);
     if(!m)return;
-    const food=m[1].trim();const gram=parseFloat(m[2])||100;
+    const food=m[1].trim();const unit=m[3]||'';
+    let gram=parseFloat(m[2]);
+    if(isNaN(gram))gram=100; // 纯食物名无数字，按100g计
+    if(UNIT_DEFAULT[unit])gram=UNIT_DEFAULT[unit]; // 杯/包等单位用标准份量
+    // 饮料以"杯/瓶/听"计整份时，库值按每100g折算，整份约等于100g等价热量（如奶茶1杯≈库值）
+    if(/奶茶|奶绿|奶盖|可乐|雪碧|芬达|果汁|橙汁|苹果汁|咖啡|拿铁|美式|能量饮料|冰激凌|雪糕|布丁|养乐多|酸奶饮品|旺仔|蜜雪|茶/.test(food)&&['杯','瓶','听','个'].includes(unit))gram=100;
     // 1) 精确/最长匹配
     let per=0,matched='';
     for(const k in FOOD_PER100){if(food.includes(k)&&k.length>matched.length){per=FOOD_PER100[k];matched=k;}}
@@ -1134,35 +1115,35 @@ function renderFood(){
   });
   $$('#foodList .food-edit').forEach(b=>b.onclick=()=>{
     const i=+b.dataset.i;const f=foods[td][i];
-    const raw=prompt('编辑这餐记录（格式：备注 食物名+克数，如 午餐 牛肉100g+米饭100g）',f.name);
-    if(!raw)return;
-    let m='',text=raw;
-    const cm=raw.match(/^(.+?)[：:]\s*(.+)$/);
-    if(cm){m=cm[1].trim();text=cm[2].trim();}else if(/\s/.test(raw)&&!raw.includes('g')&&!raw.includes('克')){[m,text]=raw.split(/\s+/);}
-    const r=calcFoodKcal(text);
-    if(r.kcal===0){toast('未能识别食物，请按"食物名+克数"');return;}
-    foods[td][i]={name:raw.trim(),kcal:r.kcal,m,detail:r.detail};
-    LS('foods',foods);renderFood();toast('已修改 🍱');
+    openFoodModal(i,f.name);
   });
   const total=list.reduce((s,f)=>s+(+f.kcal||0),0);
   $('#foodKcal').textContent=total;
   const target=+$('#foodTarget').textContent||1500;
   $('#foodKcalBar').style.width=Math.min(100,Math.round(total/target*100))+'%';
 }
-$('#foodAdd').onclick=()=>{
-  const raw=prompt('记录这餐（格式示例：午餐 牛肉100g+米饭100g+西兰花100g）');
-  if(!raw)return;
-  // 备注与食物分离：冒号/空格前为备注
+let foodEditIdx=null;
+function openFoodModal(idx,val){
+  foodEditIdx=(idx===undefined||idx===null)?null:idx;
+  $('#foodModalTitle').textContent=foodEditIdx===null?'添加一餐':'编辑这餐';
+  $('#foodInput').value=val||'';
+  $('#foodModal').classList.add('show');
+}
+$('#foodModalClose').onclick=()=>$('#foodModal').classList.remove('show');
+$('#foodModal').onclick=(e)=>{if(e.target.id==='foodModal')$('#foodModal').classList.remove('show');};
+$('#foodSave').onclick=()=>{
+  const raw=$('#foodInput').value.trim();if(!raw){toast('请输入内容');return;}
   let m='',text=raw;
   const cm=raw.match(/^(.+?)[：:]\s*(.+)$/);
   if(cm){m=cm[1].trim();text=cm[2].trim();}else if(/\s/.test(raw)&&!raw.includes('g')&&!raw.includes('克')){[m,text]=raw.split(/\s+/);}
   const r=calcFoodKcal(text);
   if(r.kcal===0){toast('未能识别食物，请按"食物名+克数"格式');return;}
-  const finalM=m||'';
-  const td=today();if(!foods[td])foods[td]=[];
-  foods[td].push({name:raw.trim(),kcal:r.kcal,m:finalM,detail:r.detail});
-  LS('foods',foods);renderFood();toast('已记录 🍱 '+r.kcal+'kcal');
+  const td=today();
+  if(foodEditIdx===null){if(!foods[td])foods[td]=[];foods[td].push({name:raw,kcal:r.kcal,m,detail:r.detail});toast('已记录 🍱 '+r.kcal+'kcal');}
+  else{foods[td][foodEditIdx]={name:raw,kcal:r.kcal,m,detail:r.detail};toast('已修改 🍱');}
+  LS('foods',foods);$('#foodModal').classList.remove('show');renderFood();
 };
+$('#foodAdd').onclick=()=>openFoodModal(null,'');
 
 // 饮水
 let water=LS('water')||{}; // {date:cups}
@@ -1214,12 +1195,12 @@ function renderTrend(){
   const vs=vals.map(d=>d.v);const min=Math.min(...vs),max=Math.max(...vs);
   const range=(max-min)||1;
   const ys=vs.map(v=>H-pad-(H-2*pad)*(v-min)/range);
-  const color=trendType==='weight'?'#7c5cff':trendType==='fat'?'#ff8fab':'#21bf73';
+  const color=trendType==='weight'?'#3b82f6':trendType==='fat'?'#22d3ee':'#10b981';
   const line=xs.map((x,i)=>(i?'L':'M')+x.toFixed(1)+' '+ys[i].toFixed(1)).join(' ');
   const dots=xs.map((x,i)=>`<circle cx="${x.toFixed(1)}" cy="${ys[i].toFixed(1)}" r="3.5" fill="${color}"/>`).join('');
-  const labels=vals.map((d,i)=>`<text x="${xs[i].toFixed(1)}" y="${H-6}" font-size="9" fill="#8a8aa0" text-anchor="middle">${d.date.slice(5)}</text>`).join('');
-  const ymin=`<text x="2" y="${(H-pad).toFixed(0)}" font-size="9" fill="#8a8aa0">${min}</text>`;
-  const ymax=`<text x="2" y="${(pad+2).toFixed(0)}" font-size="9" fill="#8a8aa0">${max}</text>`;
+  const labels=vals.map((d,i)=>`<text x="${xs[i].toFixed(1)}" y="${H-6}" font-size="9" fill="#7c8aa0" text-anchor="middle">${d.date.slice(5)}</text>`).join('');
+  const ymin=`<text x="2" y="${(H-pad).toFixed(0)}" font-size="9" fill="#7c8aa0">${min}</text>`;
+  const ymax=`<text x="2" y="${(pad+2).toFixed(0)}" font-size="9" fill="#7c8aa0">${max}</text>`;
   el.innerHTML=`<svg width="100%" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
     <path d="${line}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linejoin="round"/>
     ${dots}${labels}${ymin}${ymax}</svg>`;
@@ -1232,6 +1213,107 @@ $$('#trendFilters .filter-chip').forEach(f=>f.onclick=()=>{
   trendType=f.dataset.t;$$('#trendFilters .filter-chip').forEach(x=>x.classList.remove('active'));f.classList.add('active');renderTrend();
 });
 renderBody();renderFood();renderWater();renderSleep();renderTrend();
+// ============ 历史数据查看（近7天每日总量）============
+// 最近 N 天日期数组（含今天，从旧到新）
+function lastNDates(n){
+  const arr=[];const p=x=>String(x).padStart(2,'0');
+  for(let i=n-1;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);
+    arr.push(d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate()));}
+  return arr;
+}
+// 健身：某日打卡动作总消耗 kcal（反查动作表）
+const allFitById={};FIT_PLAN.forEach(p=>p.items.forEach(it=>{allFitById[it.id]=it;}));
+function fitKcalOfDate(date){
+  const done=fitDone[date];if(!done)return 0;let s=0;
+  for(const id in done){if(done[id]&&allFitById[id])s+=(+allFitById[id].kcal||0);}
+  return s;
+}
+// 历史数据渲染
+let histSec='fit';
+let histRange='week'; // week | month
+function monthDates(){
+  const d=new Date();const y=d.getFullYear(),m=d.getMonth();
+  const days=new Date(y,m+1,0).getDate();const p=x=>String(x).padStart(2,'0');
+  const arr=[];for(let i=1;i<=days;i++)arr.push(`${y}-${p(m+1)}-${p(i)}`);
+  return arr;
+}
+function buildRow(d,sec){
+  if(sec==='fit'){
+    const k=fitKcalOfDate(d);const cnt=fitDone[d]?Object.values(fitDone[d]).filter(Boolean).length:0;
+    return `<div class="hist-row"><div class="hist-date">${d.slice(5)}<small>${WK[new Date(d).getDay()]}</small></div>
+      <div class="hist-val">${k} kcal<small>${cnt}个动作打卡</small></div></div>`;
+  }else if(sec==='eng'){
+    const o=engDur[d]||{};const m=Object.values(o).reduce((s,x)=>s+(+x||0),0);
+    return `<div class="hist-row"><div class="hist-date">${d.slice(5)}<small>${WK[new Date(d).getDay()]}</small></div>
+      <div class="hist-val">${m} 分钟<small>英语学习时长</small></div></div>`;
+  }else if(sec==='bill'){
+    const list=bills.filter(b=>b.date===d);
+    const sin=list.filter(b=>b.type==='in').reduce((s,b)=>s+b.amt,0);
+    const sout=list.filter(b=>b.type==='out').reduce((s,b)=>s+b.amt,0);
+    const has=list.length>0;
+    return `<div class="hist-row"><div class="hist-date">${d.slice(5)}<small>${WK[new Date(d).getDay()]}</small></div>
+      <div class="hist-val">${has?('收¥'+(sin?fmt(sin):0)+' / 支¥'+(sout?fmt(sout):0)):'—'}<small>${has?list.length+'笔':'无记录'}</small></div></div>`;
+  }else if(sec==='food'){
+    const list=foods[d]||[];const k=list.reduce((s,f)=>s+(+f.kcal||0),0);
+    return `<div class="hist-row"><div class="hist-date">${d.slice(5)}<small>${WK[new Date(d).getDay()]}</small></div>
+      <div class="hist-val">${k} kcal<small>${list.length?list.length+'餐':'未记录'}</small></div></div>`;
+  }else if(sec==='health'){
+    const cups=water[d]||0;const sl=sleep[d]?sleepDurMin(sleep[d]):null;
+    const bd=bodyData.find(x=>x.date===d);const bmi=bd&&bd.bmi?bd.bmi:'—';
+    const slTxt=sl==null?'—':(Math.floor(sl/60)+'h'+(sl%60?sl%60+'m':''));
+    return `<div class="hist-row"><div class="hist-date">${d.slice(5)}<small>${WK[new Date(d).getDay()]}</small></div>
+      <div class="hist-val" style="font-size:12px">💧${cups}杯 · 😴${slTxt}<small>BMI ${bmi}</small></div></div>`;
+  }
+  return '';
+}
+function monthSummary(sec){
+  const ds=monthDates();
+  if(sec==='fit'){const t=ds.reduce((s,d)=>s+fitKcalOfDate(d),0);return `🔥 本月累计消耗 ${t} kcal`;}
+  if(sec==='eng'){const t=ds.reduce((s,d)=>s+Object.values(engDur[d]||{}).reduce((a,x)=>a+(+x||0),0),0);return `⏱️ 本月累计学习 ${t} 分钟`;}
+  if(sec==='bill'){
+    const mb=bills.filter(b=>b.date.slice(0,7)===ds[0].slice(0,7));
+    const sin=mb.filter(b=>b.type==='in').reduce((s,b)=>s+b.amt,0);
+    const sout=mb.filter(b=>b.type==='out').reduce((s,b)=>s+b.amt,0);
+    return `💰 本月 收¥${fmt(sin)} / 支¥${fmt(sout)} / 结余¥${fmt(sin-sout)}（${mb.length}笔）`;
+  }
+  if(sec==='food'){const t=ds.reduce((s,d)=>s+(foods[d]||[]).reduce((a,f)=>a+(+f.kcal||0),0),0);
+    const days=ds.filter(d=>(foods[d]||[]).length).length||1;return `🍱 本月摄入 ${t} kcal（日均 ${Math.round(t/days)}）`;}
+  if(sec==='health'){
+    const cups=ds.reduce((s,d)=>s+(water[d]||0),0);
+    const sls=ds.map(d=>sleep[d]?sleepDurMin(sleep[d]):null).filter(Boolean);
+    const slAvg=sls.length?Math.round(sls.reduce((a,b)=>a+b,0)/sls.length/60*10)/10:0;
+    const recent=bodyData.filter(b=>b.date.slice(0,7)===ds[0].slice(0,7)).slice(-1)[0];
+    return `🌿 本月饮水 ${cups}杯 · 睡眠均 ${slAvg}h${recent?' · 最新BMI '+recent.bmi:''}`;
+  }
+  return '';
+}
+function renderHist(){
+  $$('#histSeg button').forEach(b=>b.classList.toggle('on',b.dataset.s===histSec));
+  $$('#histRange button').forEach(b=>b.classList.toggle('on',b.dataset.r===histRange));
+  const dates=histRange==='week'?lastNDates(7):monthDates();
+  // 月模式只显示有记录的日期（更清爽）；周模式全部显示
+  const shown=histRange==='month'?dates.filter(d=>hasData(d,histSec)):dates;
+  let rows=shown.map(d=>buildRow(d,histSec)).join('');
+  if(histRange==='month'){
+    const sum=monthSummary(histSec);
+    rows+=`<div class="hist-row" style="background:var(--primary);color:#fff;font-weight:700">
+      <div class="hist-date" style="color:#fff">${new Date().getMonth()+1}月汇总</div>
+      <div class="hist-val" style="color:#fff;font-size:12px">${sum}</div></div>`;
+  }
+  $('#histBody').innerHTML=rows||'<div class="hist-empty">暂无数据</div>';
+}
+function hasData(d,sec){
+  if(sec==='fit')return fitDone[d]&&Object.values(fitDone[d]).some(Boolean);
+  if(sec==='eng')return engDur[d]&&Object.values(engDur[d]).some(Boolean);
+  if(sec==='bill')return bills.some(b=>b.date===d);
+  if(sec==='food')return (foods[d]||[]).length>0;
+  if(sec==='health')return (water[d]||0)>0||!!sleep[d]||bodyData.some(b=>b.date===d);
+  return false;
+}
+$$('#histSeg button').forEach(b=>b.onclick=()=>{histSec=b.dataset.s;renderHist();});
+$$('#histRange button').forEach(b=>b.onclick=()=>{histRange=b.dataset.r;renderHist();});
+$('#histModalClose').onclick=()=>$('#histModal').classList.remove('show');
+function openHist(sec){histSec=sec||'fit';renderHist();$('#histModal').classList.add('show');}
+document.addEventListener('click',e=>{const b=e.target.closest('.hist-open');if(b)openHist(b.dataset.sec);});
+
 </script>
-</body>
-</html>
